@@ -1,305 +1,312 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-const CandidateDashboard = () => {
-  return (
-    <div className="relative min-h-screen w-full bg-background-dark text-white font-body overflow-x-hidden">
-      
-      {/* Ambient Background Mesh - Darker */}
-      <div className="absolute inset-0 bg-cosmic-mesh opacity-80 pointer-events-none z-0"></div>
-      <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none"></div>
+// --- Shared Components ---
 
-      {/* Main Container */}
-      <div className="relative z-10 p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
-        
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <h2 className="font-display text-3xl font-bold tracking-tight text-white drop-shadow-md">WELCOME BACK, ALEX</h2>
-            <p className="text-sm text-gray-400 font-display tracking-wider uppercase mt-1">Let's find your next big opportunity</p>
+const GlassCard = ({ children, className = "" }) => (
+  <div className={`bg-[#21242c] border border-white/5 rounded-xl relative overflow-hidden shadow-lg ${className}`}>
+    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 pointer-events-none"></div>
+    <div className="relative z-10">
+      {children}
+    </div>
+  </div>
+);
+
+// --- Sidebar Component (Now Responsive) ---
+const Sidebar = ({ isOpen, onClose }) => (
+  <>
+    {/* Overlay for mobile - high z so menu is visible on small devices */}
+    <div
+      className={`fixed inset-0 bg-black/50 z-[55] transition-opacity duration-300 lg:hidden ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+      onClick={onClose}
+      aria-hidden={!isOpen}
+    />
+    <aside
+      className={`
+        fixed z-[60] top-0 left-0
+        h-full bg-[#15171c] border-r border-white/5 flex flex-col flex-shrink-0
+        w-64 max-w-[85vw] transition-transform duration-300 ease-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        lg:static lg:translate-x-0 lg:w-64 lg:max-w-none
+      `}
+      aria-hidden={!isOpen}
+    >
+      {/* Logo Area */}
+      <div className="h-20 flex items-center px-6 border-b border-white/5 bg-[#15171c]">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 text-[#1f6b7a] flex items-center justify-center bg-[#1f6b7a]/20 rounded-full border border-[#1f6b7a]/30">
+            <span className="material-symbols-outlined text-[20px]">psychology</span>
           </div>
-          <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="relative w-full md:w-72">
-              <input 
-                className="w-full bg-navy-sidebar border border-white/5 rounded-full pl-10 pr-4 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all placeholder-gray-600 shadow-inner" 
-                placeholder="Search jobs, skills..." 
+          <h2 className="text-white text-lg font-bold tracking-tight font-sans">SkillHire</h2>
+        </div>
+        {/* Close button on mobile */}
+        <button
+          className="lg:hidden ml-auto text-gray-500 hover:text-white transition-colors focus:outline-none"
+          onClick={onClose}
+          aria-label="Close sidebar"
+        >
+          <span className="material-symbols-outlined text-[28px] leading-none">close</span>
+        </button>
+      </div>
+
+      {/* Menu Items */}
+      <div className="flex-1 py-6 px-3 space-y-1 overflow-y-auto">
+        <p className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Main Menu</p>
+        {/* Active Dashboard Link */}
+        <a href="#" className="flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-bold bg-[#1f6b7a]/10 text-[#1f6b7a] border border-[#1f6b7a]/20 shadow-sm transition-all">
+          <span className="material-symbols-outlined text-[20px]">dashboard</span>
+          Dashboard
+        </a>
+        {[
+          { icon: 'search', label: 'Find Jobs' },
+          { icon: 'send', label: 'Applications', badge: 4 },
+          { icon: 'chat_bubble', label: 'Messages' },
+          { icon: 'verified_user', label: 'Assessments' }
+        ].map((item) => (
+          <a key={item.label} href="#" className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm font-medium transition-all group">
+            <span className="material-symbols-outlined text-[20px] group-hover:text-[#1f6b7a] transition-colors">{item.icon}</span>
+            {item.label}
+            {item.badge && <span className="ml-auto bg-[#1f6b7a] text-white text-[10px] font-bold py-0.5 px-2 rounded-full shadow-lg">{item.badge}</span>}
+          </a>
+        ))}
+        <div className="pt-6 mt-6 border-t border-white/5">
+          <p className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Settings</p>
+          <a href="#" className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm font-medium transition-all group">
+            <span className="material-symbols-outlined text-[20px] group-hover:text-[#1f6b7a] transition-colors">person</span>
+            Profile
+          </a>
+          <a href="#" className="flex items-center gap-3 px-3 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm font-medium transition-all group">
+            <span className="material-symbols-outlined text-[20px] group-hover:text-[#1f6b7a] transition-colors">settings</span>
+            Settings
+          </a>
+        </div>
+      </div>
+
+      {/* User Profile Footer */}
+      <div className="p-4 border-t border-white/5 bg-[#15171c]">
+        <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#1f6b7a] to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-lg">JD</div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-white truncate">John Doe</p>
+            <p className="text-[10px] text-gray-400 truncate">Full Stack Dev</p>
+          </div>
+          <button className="text-gray-500 hover:text-white transition-colors">
+            <span className="material-symbols-outlined text-[18px]">logout</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+  </>
+);
+
+// --- Sub-Components ---
+
+const JobCard = ({ logo, role, company, tags, match, salary }) => (
+  <div className="bg-[#21242c] rounded-xl border border-white/5 p-5 relative overflow-hidden group hover:border-[#1f6b7a]/30 transition-all duration-300 shadow-md">
+    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+    <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5">
+      <div className="flex-shrink-0">
+        <div className="w-12 h-12 rounded-lg bg-[#1a1d23] border border-white/10 flex items-center justify-center text-xl text-white shadow-lg group-hover:scale-105 transition-transform duration-300">
+          <span className="material-symbols-outlined text-[24px]">{logo}</span>
+        </div>
+      </div>
+      <div className="flex-1 min-w-0 w-full">
+        <h4 className="text-sm font-bold text-white mb-1 group-hover:text-[#1f6b7a] transition-colors duration-300 truncate">{role}</h4>
+        <p className="text-xs text-gray-400 mb-3 truncate">{company}</p>
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span key={tag} className="px-2.5 py-1 rounded bg-[#1a1d23] border border-white/5 text-[10px] font-medium text-gray-300">{tag}</span>
+          ))}
+          {salary && <span className="px-2.5 py-1 rounded bg-[#1a1d23] border border-white/5 text-[10px] font-medium text-green-400 border-green-400/10">{salary}</span>}
+        </div>
+      </div>
+      <div className="flex flex-row sm:flex-col items-end sm:items-end gap-3 pl-0 sm:pl-5 border-l-0 sm:border-l border-white/5 w-full sm:w-auto justify-between sm:justify-end">
+        <div className="flex flex-row sm:flex-col items-end">
+          <span className="text-[9px] text-gray-500 uppercase font-bold tracking-wider">Match</span>
+          <span className="text-xl font-extrabold text-[#1f6b7a] drop-shadow-[0_0_8px_rgba(31,107,122,0.4)] sm:ml-0 ml-3">{match}%</span>
+        </div>
+        <button className="bg-[#1f6b7a] hover:bg-[#2a8a9c] text-white text-[10px] font-bold py-2 px-5 rounded transition-all shadow-lg shadow-[#1f6b7a]/20 w-full sm:w-auto">Apply</button>
+      </div>
+    </div>
+  </div>
+);
+
+const StatCard = ({ icon, label, value, subtext, progress }) => (
+  <div className="bg-[#21242c] rounded-xl border border-white/5 p-5 relative overflow-hidden group hover:border-[#1f6b7a]/30 transition-all shadow-md">
+    <div className="relative z-10">
+      <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity transform group-hover:scale-110 duration-500">
+        <span className="material-symbols-outlined text-7xl text-[#1f6b7a]">{icon}</span>
+      </div>
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1.5">{label}</p>
+          <h3 className="text-4xl font-extrabold text-white">{value}</h3>
+        </div>
+        <div className="w-12 h-12 rounded-lg bg-[#1f6b7a]/10 flex items-center justify-center text-[#1f6b7a] border border-[#1f6b7a]/20">
+          <span className="material-symbols-outlined text-2xl">{icon}</span>
+        </div>
+      </div>
+      {progress ? (
+        <div className="w-full bg-[#1a1d23] h-1.5 rounded-full overflow-hidden">
+          <div className="bg-[#1f6b7a] h-full rounded-full w-[85%] shadow-[0_0_8px_rgba(31,107,122,0.6)]"></div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 rounded bg-white/5 w-fit border border-white/5">{subtext}</div>
+      )}
+      {progress && (
+        <p className="text-[10px] text-[#2a8a9c] mt-3 font-medium flex items-center gap-1">
+          <span className="material-symbols-outlined text-[12px]">info</span> Complete portfolio to reach 100%
+        </p>
+      )}
+    </div>
+  </div>
+);
+
+// --- Main Layout (with Responsive Sidebar) ---
+
+export default function Dashboard() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  return (
+    <div className="fixed inset-0 z-50 flex w-screen h-screen bg-[#15171c] text-white font-sans overflow-hidden selection:bg-[#1f6b7a] selection:text-white">
+      {/* Sidebar for large screens & mobile drawer */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      {/* Hamburger Button - only on mobile (above layout header so menu is visible on small devices) */}
+      <button
+        className="fixed top-4 left-4 z-[60] flex items-center justify-center w-10 h-10 bg-[#21242c] rounded-lg border border-white/10 lg:hidden hover:bg-[#1a1d23]/80 transition-colors focus:outline-none shadow"
+        style={{ WebkitTapHighlightColor: 'transparent' }}
+        aria-label="Open sidebar"
+        onClick={() => setSidebarOpen(true)}
+      >
+        <span className="material-symbols-outlined text-2xl text-white">menu</span>
+      </button>
+
+      {/* Main Content Column */}
+      <div className="flex-1 flex flex-col h-full relative bg-[#15171c] ml-0 lg:ml-0">
+        {/* Ambient Glow */}
+        <div className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-30"
+             style={{ background: 'radial-gradient(circle at 60% 40%, rgba(76, 29, 149, 0.15) 0%, rgba(31, 107, 122, 0.1) 40%, rgba(21, 23, 28, 0) 70%)' }}>
+        </div>
+
+        {/* Header */}
+        <header className="h-20 flex-shrink-0 flex items-center justify-between px-3 sm:px-6 md:px-8 bg-[#15171c]/95 backdrop-blur-md border-b border-white/5 relative z-20">
+          <div className="w-1/3 min-w-0 flex items-center">
+            <div className="relative hidden md:block group w-full max-w-xs">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-[#1f6b7a] transition-colors material-symbols-outlined text-[20px]">search</span>
+              <input
+                className="w-full bg-[#1a1d23] border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-xs text-white focus:ring-1 focus:ring-[#1f6b7a] focus:border-[#1f6b7a] placeholder-gray-600 transition-all outline-none"
+                placeholder="Search jobs, skills..."
                 type="text"
               />
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">search</span>
             </div>
-            <button className="relative p-2.5 rounded-full bg-navy-sidebar border border-white/5 hover:bg-white/5 text-gray-400 hover:text-white transition-colors shadow-lg">
-              <span className="material-symbols-outlined">notifications</span>
-              <span className="absolute top-2.5 right-2.5 size-2 bg-primary rounded-full animate-pulse shadow-[0_0_8px_#00e6bf]"></span>
+          </div>
+          <div className="w-1/3 flex flex-col items-center justify-center text-center min-w-0">
+            <h1 className="text-lg font-bold text-white tracking-tight truncate">Welcome back, John</h1>
+            <p className="text-[11px] text-gray-400 hidden sm:block truncate">Here's what's happening today</p>
+          </div>
+          <div className="w-1/3 flex justify-end items-center gap-3">
+            <button className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-white rounded-lg bg-[#1a1d23] border border-white/5 hover:border-white/10 transition-all relative">
+              <span className="material-symbols-outlined text-[22px]">notifications</span>
+              <span className="absolute top-2.5 right-3 w-2 h-2 bg-[#1f6b7a] rounded-full shadow-[0_0_8px_rgba(31,107,122,0.8)]"></span>
             </button>
           </div>
-        </div>
+        </header>
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Stat 1 */}
-          <div className="bg-card-depth/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-primary/20 transition-all shadow-xl">
-            <div className="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <span className="material-symbols-outlined text-8xl text-primary">pie_chart</span>
-            </div>
-            <h3 className="text-gray-500 font-display text-xs font-bold uppercase tracking-widest mb-2">Profile Completion</h3>
-            <div className="flex items-end gap-3 relative z-10">
-              <span className="text-5xl font-bold font-display text-white tracking-tight">75%</span>
-              <span className="text-primary text-sm font-bold mb-2 drop-shadow-[0_0_8px_rgba(0,230,191,0.6)]">Almost there</span>
-            </div>
-            <div className="w-full bg-[#0f0f1a] h-2 rounded-full mt-5 overflow-hidden border border-white/5">
-              <div className="h-full bg-primary w-[75%] rounded-full shadow-[0_0_12px_#00e6bf]"></div>
-            </div>
-          </div>
-
-          {/* Stat 2 */}
-          <div className="bg-card-depth/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-blue-400/20 transition-all shadow-xl">
-            <div className="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <span className="material-symbols-outlined text-8xl text-blue-400">send</span>
-            </div>
-            <h3 className="text-gray-500 font-display text-xs font-bold uppercase tracking-widest mb-2">Total Applications</h3>
-            <div className="flex items-end gap-3 relative z-10">
-              <span className="text-5xl font-bold font-display text-white tracking-tight">12</span>
-              <span className="text-green-400 text-sm font-bold mb-2 flex items-center bg-green-400/10 px-2 py-0.5 rounded">
-                <span className="material-symbols-outlined text-sm mr-1">trending_up</span>
-                +2 this week
-              </span>
-            </div>
-            <div className="mt-5 flex -space-x-3 overflow-hidden pl-1">
-              {['G', 'M', 'U'].map((letter, i) => (
-                 <div key={i} className={`inline-block h-8 w-8 rounded-full ring-2 ring-[#1E2330] flex items-center justify-center text-[10px] font-bold text-white shadow-lg ${i === 0 ? 'bg-blue-600' : i === 1 ? 'bg-sky-500' : 'bg-gray-800'}`}>
-                   {letter}
-                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Stat 3 */}
-          <div className="bg-card-depth/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-purple-400/20 transition-all shadow-xl">
-            <div className="absolute right-0 top-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-              <span className="material-symbols-outlined text-8xl text-purple-400">event</span>
-            </div>
-            <h3 className="text-gray-500 font-display text-xs font-bold uppercase tracking-widest mb-2">Interviews</h3>
-            <div className="flex items-end gap-3 relative z-10">
-              <span className="text-5xl font-bold font-display text-white tracking-tight">3</span>
-              <span className="text-purple-400 text-sm font-bold mb-2 bg-purple-400/10 px-2 py-0.5 rounded">Upcoming</span>
-            </div>
-            <div className="mt-5 text-xs text-gray-400 flex items-center gap-2 bg-white/5 p-2 rounded-lg border border-white/5">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_5px_#00e6bf]"></span>
-              Next: Technical Round w/ Stripe in 2d
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          
-          {/* Left Column: Chart & Jobs */}
-          <div className="xl:col-span-2 space-y-8">
+        {/* Dashboard Body - Adjusted Layout & Spacing */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 relative z-10 custom-scrollbar">
+          <div className="w-full space-y-6 sm:space-y-8">
             
-            {/* Activity Chart */}
-            <div className="bg-card-depth/80 backdrop-blur-md border border-white/5 rounded-2xl p-6 shadow-xl">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h3 className="font-display font-bold text-lg text-white">Application Activity</h3>
-                  <p className="text-xs text-gray-400 mt-1">Last 30 days performance</p>
-                </div>
-                <select className="bg-navy-sidebar border border-white/10 text-xs text-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:border-white/20">
-                  <option>Monthly</option>
-                  <option>Weekly</option>
-                </select>
-              </div>
+            {/* Stats Row */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+              <StatCard icon="edit_note" label="Profile Status" value="85%" progress={true} />
+              <StatCard icon="auto_awesome" label="Matching Jobs" value="12" subtext={<><span className="text-green-400 material-symbols-outlined text-[14px] mr-1">trending_up</span> +4 new today</>} />
+              <StatCard icon="rocket_launch" label="Applications" value="8" subtext={<><span className="text-yellow-400 material-symbols-outlined text-[14px] mr-1">pending</span> 2 pending review</>} />
+            </div>
+
+            {/* Split Row */}
+            <div className="grid grid-cols-1 gap-8 h-full lg:grid-cols-3">
               
-              {/* CSS Bar Chart */}
-              <div className="h-56 w-full flex items-end justify-between gap-3 px-2 relative">
-                 {/* Grid lines */}
-                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-10">
-                  {[...Array(4)].map((_, i) => <div key={i} className="w-full border-t border-dashed border-white"></div>)}
+              {/* Left: Job Feed */}
+              <div className="lg:col-span-2 space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-1 gap-2">
+                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[#1f6b7a] text-[20px]">recommend</span>
+                    Recommended Jobs
+                  </h3>
+                  <button className="text-xs text-[#1f6b7a] hover:text-white font-bold transition-colors flex items-center gap-1 w-max">
+                    View All <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                  </button>
                 </div>
-                
-                {/* Bars */}
-                {[
-                  { h: '30%', val: 2 }, { h: '45%', val: 5 }, { h: '25%', val: 3 }, 
-                  { h: '60%', val: 8 }, { h: '50%', val: 6 }, { h: '80%', val: 12 }, 
-                  { h: '40%', val: 4, active: true }
-                ].map((bar, i) => (
-                  <div key={i} className={`w-full rounded-t transition-all duration-300 relative group cursor-pointer ${bar.active ? 'bg-gradient-to-t from-primary/10 to-primary shadow-[0_0_20px_rgba(0,230,191,0.2)]' : 'bg-[#2A3040] hover:bg-[#353C4F]'}`} style={{ height: bar.h }}>
-                    <div className={`absolute -top-10 left-1/2 -translate-x-1/2 text-xs px-2.5 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity font-bold shadow-lg ${bar.active ? 'bg-primary text-black' : 'bg-white text-black'}`}>
-                      {bar.val}
-                      <div className={`absolute bottom-[-4px] left-1/2 -translate-x-1/2 w-2 h-2 rotate-45 ${bar.active ? 'bg-primary' : 'bg-white'}`}></div>
+                <div className="space-y-4">
+                  <JobCard logo="diamond" role="Senior Frontend Engineer" company="AcmeCorp • Remote" tags={['React', 'TypeScript']} salary="$140k - $180k" match="98" />
+                  <JobCard logo="change_history" role="Product Designer" company="Vertex Inc. • New York" tags={['Figma', 'UI/UX']} match="94" />
+                  <JobCard logo="hexagon" role="ML Engineer" company="HexaTech • Austin, TX" tags={['Python', 'PyTorch']} salary="$160k+" match="89" />
+                  <JobCard logo="code_blocks" role="Full Stack Developer" company="StackFlow • Remote" tags={['Next.js', 'Node']} match="82" />
+                </div>
+              </div>
+
+              {/* Right: Widgets */}
+              <div className="space-y-6">
+                {/* Skill Verification */}
+                <div className="bg-[#21242c] rounded-xl border border-white/5 p-5 relative overflow-hidden shadow-md">
+                  <h3 className="text-sm font-bold text-white mb-5 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-[#1f6b7a] text-[20px]">verified_user</span>
+                    Skill Verification
+                  </h3>
+                  <div className="space-y-5">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <div className="w-9 h-9 rounded bg-[#e34c26]/10 flex items-center justify-center text-[#e34c26] border border-[#e34c26]/20">
+                          <span className="material-symbols-outlined text-base">html</span>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-white">JavaScript</p>
+                          <p className="text-[10px] text-gray-500">2 days ago</p>
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-bold text-green-400 border border-green-400/20 px-2 py-0.5 rounded bg-green-400/10">PASSED</span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+                      <div className="flex items-center gap-3 w-full sm:w-auto">
+                        <div className="w-9 h-9 rounded bg-[#1f6b7a]/10 flex items-center justify-center text-[#1f6b7a] border border-[#1f6b7a]/20">
+                          <span className="material-symbols-outlined text-base">database</span>
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-white">System Design</p>
+                          <p className="text-[10px] text-gray-500">Not attempted</p>
+                        </div>
+                      </div>
+                      <button className="text-[9px] font-bold text-white border border-[#1f6b7a]/50 px-2.5 py-1 rounded bg-[#1f6b7a] hover:bg-[#2a8a9c] transition-all w-full sm:w-auto">START</button>
                     </div>
                   </div>
-                ))}
-              </div>
-              <div className="flex justify-between mt-4 text-[10px] text-gray-500 font-display uppercase tracking-widest px-1">
-                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
-              </div>
-            </div>
+                  <button className="w-full mt-6 py-2.5 border border-white/10 rounded-lg text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-white hover:bg-white/5 transition-all">View Report</button>
+                </div>
 
-            {/* Recommended Jobs */}
-            <div>
-              <div className="flex items-center justify-between mb-6 px-1">
-                <h2 className="font-display font-bold text-xl tracking-wide text-white">RECOMMENDED JOBS</h2>
-                <a className="text-sm text-primary hover:text-white transition-colors flex items-center gap-1 group cursor-pointer font-medium">
-                  View all 
-                  <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                </a>
-              </div>
-              
-              <div className="space-y-4">
-                {/* Job 1 */}
-                <JobCard 
-                  logo="https://logo.clearbit.com/google.com" 
-                  role="UX Designer Intern" 
-                  company="Google" 
-                  location="Mountain View, CA" 
-                  match="98%" 
-                  salary="$45 - $60 / hr" 
-                  tags={['Remote Friendly', 'Design']}
-                  primaryAction={true}
-                />
-                 {/* Job 2 */}
-                 <JobCard 
-                  logo="https://logo.clearbit.com/tesla.com" 
-                  role="Frontend Engineer" 
-                  company="Tesla" 
-                  location="Austin, TX" 
-                  match="85%" 
-                  salary="$110k - $140k" 
-                  tags={['Full-time', 'React']}
-                  logoInvert={true}
-                />
-                 {/* Job 3 */}
-                 <JobCard 
-                  logo="https://logo.clearbit.com/instagram.com" 
-                  role="Product Manager Assoc." 
-                  company="Instagram" 
-                  location="New York, NY" 
-                  match="92%" 
-                  salary="$125k - $150k" 
-                  tags={['Hybrid', 'Product']}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Sidebar Extras */}
-          <div className="space-y-6">
-            
-            {/* Upcoming Events */}
-            <div className="bg-navy-sidebar border border-white/5 rounded-2xl p-6 shadow-xl">
-              <h3 className="font-display font-bold text-white mb-6 flex items-center gap-2 text-sm tracking-wide">
-                <span className="material-symbols-outlined text-primary">calendar_month</span> 
-                UPCOMING
-              </h3>
-              <div className="space-y-6">
-                <EventRow date="24" month="Oct" title="Mock Interview" sub="10:00 AM • Zoom" status="Confirmed" />
-                <div className="w-full border-t border-white/5"></div>
-                <EventRow date="28" month="Oct" title="Career Fair Prep" sub="2:00 PM • Hall B" />
-              </div>
-              <button className="w-full mt-6 text-xs text-gray-400 hover:text-white border border-white/10 hover:bg-white/5 py-3 rounded-xl transition-colors font-medium">View Calendar</button>
-            </div>
-
-            {/* Skill Boost */}
-            <div className="bg-card-depth/80 backdrop-blur-xl border border-white/5 rounded-2xl p-6 relative overflow-hidden shadow-xl">
-               <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl"></div>
-               <h3 className="font-display font-bold text-white mb-4 relative z-10 text-sm tracking-wide">SKILL BOOST</h3>
-               <p className="text-xs text-gray-400 mb-6 relative z-10 leading-relaxed">Skills missing from your dream jobs:</p>
-               
-               <div className="space-y-5 relative z-10">
-                 <SkillBar skill="TypeScript" progress="20%" color="bg-red-500" shadow="shadow-red-500/50" />
-                 <SkillBar skill="Figma" progress="45%" color="bg-yellow-500" shadow="shadow-yellow-500/50" />
-               </div>
-            </div>
-
-            {/* Premium Ad */}
-            <div className="rounded-2xl p-[1px] bg-gradient-to-r from-primary to-purple-600 shadow-lg shadow-primary/10">
-              <div className="bg-[#151A25] rounded-2xl p-5 h-full relative overflow-hidden group">
-                <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <div className="flex items-start gap-4 relative z-10">
-                  <div className="bg-primary/10 p-2 rounded-lg">
-                    <span className="material-symbols-outlined text-primary text-2xl">rocket_launch</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-sm">Go Premium</h4>
-                    <p className="text-[11px] text-gray-400 mt-1 leading-relaxed">Get seen by recruiters 3x faster with a highlighted profile.</p>
+                {/* Upcoming Interview */}
+                <div className="bg-[#21242c] rounded-xl border border-white/5 p-5 relative overflow-hidden shadow-md">
+                  <h3 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                    <span className="material-symbols-outlined text-purple-400 text-[20px]">calendar_month</span>
+                    Upcoming
+                  </h3>
+                  <div className="bg-[#1a1d23] rounded-lg p-4 border border-white/5">
+                    <div className="flex flex-col sm:flex-row justify-between items-start mb-2 gap-1">
+                      <div className="text-[9px] font-bold text-[#1f6b7a] bg-[#1f6b7a]/10 px-2 py-0.5 rounded border border-[#1f6b7a]/20">TOMORROW</div>
+                      <span className="text-[10px] text-gray-400 font-mono">10:00 AM</span>
+                    </div>
+                    <h4 className="font-bold text-white text-sm mb-0.5">AcmeCorp</h4>
+                    <p className="text-[11px] text-gray-400 mb-4">Tech Screen w/ Sarah</p>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button className="flex-1 bg-[#1f6b7a] hover:bg-[#2a8a9c] text-white text-[10px] font-bold py-2 rounded-md shadow-lg transition-all">Join</button>
+                      <button className="flex-1 bg-white/5 hover:bg-white/10 text-white text-[10px] font-bold py-2 rounded-md border border-white/10 transition-all">Reschedule</button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
+            </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
-};
-
-// --- Helper Components ---
-
-const JobCard = ({ logo, role, company, location, match, salary, tags, primaryAction, logoInvert }) => (
-  <div className="group bg-[#1E2330] hover:bg-[#252B3B] border border-white/5 hover:border-primary/30 rounded-2xl p-5 transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.3)] relative overflow-hidden cursor-pointer">
-    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none"></div>
-    <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center relative z-10">
-      <div className="flex gap-4 items-center">
-        <div className={`size-14 rounded-xl ${logoInvert ? 'bg-black' : 'bg-white'} flex items-center justify-center p-2.5 flex-shrink-0 shadow-lg`}>
-          <img alt={`${company} Logo`} class={`w-full h-full object-contain ${logoInvert ? 'invert' : ''}`} src={logo} />
-        </div>
-        <div>
-          <h3 className="font-display font-bold text-lg text-white group-hover:text-primary transition-colors">{role}</h3>
-          <div className="flex items-center gap-3 text-sm text-gray-400 mt-1.5 font-medium">
-            <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[18px]">apartment</span> {company}</span>
-            <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
-            <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[18px]">location_on</span> {location}</span>
-          </div>
-        </div>
-      </div>
-      <div className="flex flex-row md:flex-col items-center md:items-end gap-4 md:gap-1.5 w-full md:w-auto justify-between md:justify-end">
-        <div className={`flex items-center gap-2 border px-3 py-1 rounded-full ${primaryAction ? 'bg-primary/10 border-primary/20 shadow-[0_0_10px_rgba(0,230,191,0.1)]' : 'bg-gray-800 border-white/5'}`}>
-          {primaryAction && <span className="material-symbols-outlined text-primary text-sm animate-pulse">bolt</span>}
-          <span className={`font-bold text-sm ${primaryAction ? 'text-primary' : 'text-gray-400'}`}>{match} Match</span>
-        </div>
-        <span className="text-gray-400 text-xs font-medium">{salary}</span>
-      </div>
-    </div>
-    <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
-      <div className="flex gap-2">
-        {tags.map(tag => (
-          <span key={tag} className="px-2.5 py-1 bg-[#2A3040] rounded-md text-xs text-gray-300 border border-white/5 font-medium">{tag}</span>
-        ))}
-      </div>
-      <button className={`${primaryAction ? 'bg-primary hover:bg-[#00ffd4] text-black shadow-[0_0_20px_rgba(0,230,191,0.4)] hover:shadow-[0_0_30px_rgba(0,230,191,0.6)]' : 'bg-[#2A3040] hover:bg-[#353C4F] text-white border border-white/5'} font-bold text-sm px-6 py-2.5 rounded-lg transition-all`}>
-        {primaryAction ? 'Apply Now' : 'Details'}
-      </button>
-    </div>
-  </div>
-);
-
-const EventRow = ({ date, month, title, sub, status }) => (
-  <div className="flex gap-4 group cursor-pointer">
-    <div className="flex flex-col items-center bg-[#2A3040] rounded-lg px-3 py-2 h-fit min-w-[55px] border border-white/5 group-hover:border-primary/30 transition-colors">
-      <span className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">{month}</span>
-      <span className="text-xl font-bold text-white group-hover:text-primary transition-colors">{date}</span>
-    </div>
-    <div>
-      <p className="text-sm font-bold text-white leading-tight group-hover:text-primary transition-colors">{title}</p>
-      <p className="text-xs text-gray-500 mt-1 font-medium">{sub}</p>
-      {status && <span className="inline-block mt-1.5 text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md border border-primary/10">{status}</span>}
-    </div>
-  </div>
-);
-
-const SkillBar = ({ skill, progress, color, shadow }) => (
-  <div>
-    <div className="flex items-center justify-between mb-2">
-      <div className="flex items-center gap-2.5">
-        <div className={`size-2.5 rounded-full ${color} shadow-[0_0_8px] ${shadow}`}></div>
-        <span className="text-sm text-gray-200 font-medium">{skill}</span>
-      </div>
-      <a className="text-[10px] text-primary hover:text-[#00ffd4] hover:underline cursor-pointer font-bold uppercase tracking-wider">Find Course</a>
-    </div>
-    <div className="w-full bg-[#151A25] h-1.5 rounded-full overflow-hidden border border-white/5">
-      <div className={`h-full ${color} opacity-80`} style={{ width: progress }}></div>
-    </div>
-  </div>
-);
-
-export default CandidateDashboard;
+}

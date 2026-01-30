@@ -8,10 +8,10 @@ const Footer = () => {
           {/* Logo & Description */}
           <div className="col-span-1 sm:col-span-2 flex flex-col">
             <div className="flex items-center gap-3 mb-4 xs:mb-6">
-              <div className="size-6 xs:size-7 sm:size-8 text-primary flex items-center justify-center bg-primary/20 rounded">
+              <div className="size-6 xs:size-7 sm:size-8 text-primary flex items-center justify-center bg-primary/20 rounded-full border border-primary/20">
                 <span className="material-symbols-outlined text-base xs:text-lg">psychology</span>
               </div>
-              <h2 className="text-white text-lg xs:text-xl font-bold">SkillHire</h2>
+              <h2 className="text-white text-lg xs:text-xl font-bold font-sans">SkillHire</h2>
             </div>
             <p className="text-gray-500 max-w-xs xs:max-w-sm mb-6 xs:mb-8 text-sm xs:text-base">
               The first AI-native recruitment platform built for the future of work. Verify skills, detect fraud, and hire faster.
@@ -58,7 +58,7 @@ const Footer = () => {
         </div>
         {/* Divider & Bottom Section */}
         <div className="border-t border-white/5 pt-6 xs:pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-600 text-xs xs:text-sm text-center md:text-left">© 2024 SkillHire Inc. All rights reserved.</p>
+          <p className="text-gray-600 text-xs xs:text-sm text-center md:text-left font-sans">© 2026 SkillHire Inc. All rights reserved.</p>
           <div className="flex gap-3 xs:gap-4 text-gray-500">
             <a className="hover:text-white transition-colors" href="#" aria-label="Website">
               <span className="material-symbols-outlined text-base xs:text-lg">public</span>

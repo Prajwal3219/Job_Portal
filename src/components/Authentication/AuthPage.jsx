@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom'; // Import useLocation
+import { Link, useLocation, useNavigate } from 'react-router-dom'; // Added useNavigate
 
 const AuthPage = () => {
     const location = useLocation();
+    const navigate = useNavigate(); // Initialize navigation hook
 
     // Initialize state based on the navigation state passed from the Link
-    // If state.view is 'signup', default to false (Sign Up mode). Otherwise true (Login mode).
     const [isLogin, setIsLogin] = useState(true);
+    const [userType, setUserType] = useState('talent'); // 'talent' or 'recruiter'
 
     useEffect(() => {
         if (location.state?.view === 'signup') {
@@ -16,7 +17,21 @@ const AuthPage = () => {
         }
     }, [location.state]);
 
-    const [userType, setUserType] = useState('talent');
+    // --- NEW: Handle Login Logic ---
+    const handleAuth = (e) => {
+        e.preventDefault();
+
+        // In a real app, you would validate credentials here first.
+        // For now, we simulate a successful login and redirect.
+
+        if (userType === 'talent') {
+            console.log("Logging in as Candidate...");
+            navigate('/dashboard/candidate');
+        } else {
+            console.log("Logging in as Recruiter...");
+            navigate('/dashboard/recruiter');
+        }
+    };
 
     return (
         <div className="min-h-screen w-full bg-[#1a1d23] relative flex items-center justify-center p-4 overflow-hidden">
@@ -31,10 +46,10 @@ const AuthPage = () => {
                 {/* Header & Logo */}
                 <div className="text-center mb-8">
                     <Link to="/" className="inline-flex items-center gap-2 mb-6 hover:opacity-80 transition-opacity">
-                        <div className="size-8 text-primary flex items-center justify-center bg-primary/20 rounded-lg">
+                        <div className="size-8 text-primary flex items-center justify-center bg-primary/20 rounded-full border border-primary/30">
                             <span className="material-symbols-outlined text-[20px]">psychology</span>
                         </div>
-                        <h2 className="text-white text-xl font-bold tracking-tight">SkillHire</h2>
+                        <h2 className="text-white text-xl font-bold tracking-tight font-sans">SkillHire</h2>
                     </Link>
                     <h1 className="text-2xl font-bold text-white mb-2">
                         {isLogin ? 'Welcome Back' : 'Create Account'}
@@ -66,8 +81,8 @@ const AuthPage = () => {
                     </button>
                 </div>
 
-                {/* Form Fields */}
-                <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+                {/* Form Fields - Updated with handleAuth */}
+                <form className="space-y-4" onSubmit={handleAuth}>
 
                     {!isLogin && (
                         <div>

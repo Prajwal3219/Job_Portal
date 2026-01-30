@@ -20,9 +20,9 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-20 px-4 sm:px-6 bg-[#1a1d23] relative overflow-hidden">
+    <section className="py-16 sm:py-20 px-4 sm:px-6 bg-[#1a1d23] relative overflow-hidden">
       <div className="max-w-4xl mx-auto relative z-10">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-white text-center mb-16">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-white text-center mb-12 sm:mb-16 font-sans">
           How it works
         </h2>
         
@@ -41,8 +41,8 @@ const HowItWorks = () => {
 
                 {/* Text Section */}
                 <div className={`w-full md:w-1/2 pl-12 md:pl-0 ${idx % 2 !== 0 ? 'md:pl-12 md:text-left' : 'md:pr-12 md:text-right'}`}>
-                  <h3 className="text-xl font-bold text-white mb-2">{step.title}</h3>
-                  <p className="text-gray-400 text-sm sm:text-base">{step.desc}</p>
+                  <h3 className="text-xl font-bold text-white mb-2 font-sans">{step.title}</h3>
+                  <p className="text-gray-400 text-sm sm:text-base font-sans">{step.desc}</p>
                 </div>
 
                 {/* Image Section */}

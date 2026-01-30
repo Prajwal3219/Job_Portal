@@ -11,13 +11,13 @@ const trustedCompanies = [
 const TrustedBy = () => {
   return (
     <section className="py-10 border-y border-white/5 bg-surface-dark/30">
-      <div className="max-w-7xl mx-auto px-6">
-        <p className="text-center text-sm font-medium text-gray-500 mb-8 uppercase tracking-widest">
-          Trusted by forward-thinking teams
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <p className="text-center text-sm font-medium text-gray-500 mb-8 uppercase tracking-widest font-sans">
+          TRUSTED BY FORWARD-THINKING TEAMS
         </p>
-        <div className="flex flex-wrap justify-center gap-x-12 gap-y-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+        <div className="flex flex-wrap justify-center items-center gap-x-8 sm:gap-x-12 gap-y-6 sm:gap-y-8 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
           {trustedCompanies.map((company) => (
-            <div key={company.name} className="flex items-center gap-2 font-bold text-lg text-white">
+            <div key={company.name} className="flex items-center gap-2 font-bold text-base sm:text-lg text-white font-sans">
               <span className="material-symbols-outlined text-2xl">{company.icon}</span>
               {company.name}
             </div>

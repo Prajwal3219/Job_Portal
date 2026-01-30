@@ -2,20 +2,20 @@ import React from 'react';
 
 const Features = () => {
   return (
-    <section className="py-20 px-4 sm:px-6 relative">
+    <section className="py-16 sm:py-20 px-4 sm:px-6 relative">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 sm:mb-12 gap-6">
           <div className="max-w-2xl">
-            <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4 sm:mb-6 font-sans">
               ML-Powered Capabilities
             </h2>
-            <p className="text-gray-400 text-base sm:text-lg">
+            <p className="text-gray-400 text-base sm:text-lg font-sans">
               Our platform uses advanced machine learning to ensure every match is authentic and verified.
             </p>
           </div>
-          <button className="text-primary hover:text-white font-bold flex items-center gap-2 transition-colors">
-            View all features <span className="material-symbols-outlined">arrow_forward</span>
+          <button className="text-primary hover:text-white font-bold flex items-center gap-2 transition-colors text-sm sm:text-base font-sans shrink-0">
+            View all features <span className="material-symbols-outlined text-lg">arrow_forward</span>
           </button>
         </div>
 
@@ -23,7 +23,7 @@ const Features = () => {
            1. auto-rows ensures consistent heights.
            2. md:grid-cols-3 enables the 3-column layout on desktop.
         */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[280px]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 auto-rows-[280px]">
           
           {/* Card 1: Skill Verification (Tall Card) 
              - md:col-span-2: Takes 2 columns width
@@ -66,7 +66,7 @@ const Features = () => {
             <div className="absolute inset-0 bg-card-gradient"></div>
             <div className="relative z-10">
               <div className="size-12 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center mb-6 shadow-sm">
-                <span className="material-symbols-outlined text-2xl">policy</span>
+                <span className="material-symbols-outlined text-2xl">lock</span>
               </div>
               <h3 className="text-xl font-bold text-white mb-2">Fraud Detection</h3>
               <p className="text-gray-400 text-sm">Advanced pattern recognition blocks resume fraud.</p>

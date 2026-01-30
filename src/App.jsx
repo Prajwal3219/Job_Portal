@@ -1,10 +1,14 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+
+// Public pages
 import Landing from './components/landing/Landing';
 import AuthPage from './components/Authentication/AuthPage';
-import DashboardLayout from './components/DashboardLayout';
+
+// Dashboards (standalone full-screen pages)
 import CandidateDashboard from './components/dashboards/CandidateDashboard';
-import RecruiterDashboard from './components/dashboards/RecruiterDashboard';
+import RecruiterDashboard from './components/dashboards/recruiter/RecruiterDashboard';
+import PostJob from './components/dashboards/recruiter/PostJob';
 
 function App() {
   return (
@@ -15,15 +19,12 @@ function App() {
         <Route path="/auth" element={<AuthPage />} />
 
         {/* Candidate Routes */}
-        <Route path="/dashboard/candidate/*" element={<DashboardLayout userType="talent" />}>
-          <Route index element={<CandidateDashboard />} />
-          {/* Add more candidate routes here later, e.g., <Route path="jobs" ... /> */}
-        </Route>
+        <Route path="/dashboard/candidate" element={<CandidateDashboard />} />
 
         {/* Recruiter Routes */}
-        <Route path="/dashboard/recruiter/*" element={<DashboardLayout userType="recruiter" />}>
+        <Route path="/dashboard/recruiter">
           <Route index element={<RecruiterDashboard />} />
-          {/* Add more recruiter routes here later */}
+          <Route path="post-job" element={<PostJob />} />
         </Route>
       </Routes>
     </div>

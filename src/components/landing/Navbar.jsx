@@ -15,28 +15,28 @@ const Navbar = () => {
 
   return (
     // Main Navbar - Added solid background color to prevent see-through on scroll
-    <nav className="fixed top-0 w-full z-50 bg-[#1a1d23] border-b border-white/5 transition-all duration-300">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 w-full z-50 bg-[#1a1d23] border-b border-white/5 transition-all duration-300">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
 
-        {/* Logo Area */}
-        <div className="flex items-center gap-3">
-          <div className="size-8 text-primary flex items-center justify-center bg-primary/20 rounded-lg">
-            <span className="material-symbols-outlined text-[20px]">psychology</span>
+        {/* Logo - Left aligned */}
+        <Link to="/" className="flex items-center gap-3 shrink-0">
+          <div className="size-8 sm:size-9 flex items-center justify-center bg-primary/20 text-primary rounded-full border border-primary/30">
+            <span className="material-symbols-outlined text-[18px] sm:text-[20px] font-semibold">psychology</span>
           </div>
-          <h2 className="text-white text-xl font-bold tracking-tight">SkillHire</h2>
-        </div>
+          <h2 className="text-white text-lg sm:text-xl font-bold tracking-tight font-sans">SkillHire</h2>
+        </Link>
 
-        {/* Desktop Navigation (Hidden on Mobile) */}
-        <div className="hidden md:flex items-center gap-8">
+        {/* Desktop Navigation - Center-right */}
+        <div className="hidden md:flex flex-1 justify-end items-center gap-6 lg:gap-8">
           {['For Talent', 'For Recruiters', 'Pricing'].map((item) => (
-            <a key={item} href="#" className="text-gray-300 hover:text-white text-sm font-medium transition-colors">
+            <a key={item} href="#" className="text-gray-300 hover:text-white text-sm font-medium transition-colors whitespace-nowrap">
               {item}
             </a>
           ))}
         </div>
 
-        {/* Desktop Buttons (Hidden on Mobile) */}
-        <div className="hidden md:flex items-center gap-3">
+        {/* Desktop CTA Buttons - Right */}
+        <div className="hidden md:flex items-center gap-2 sm:gap-3 shrink-0">
           <Link to="/auth">
             <button className="glass-button px-5 h-10 rounded-lg text-sm font-bold text-white hover:bg-white/10 transition-all border border-white/10">
               Log In
@@ -67,7 +67,7 @@ const Navbar = () => {
       */}
       <div
         className={`
-          fixed inset-0 top-20 z-40 
+          fixed inset-0 top-16 sm:top-20 z-40 
           bg-[#1a1d23] 
           flex flex-col p-6 
           transition-transform duration-300 ease-in-out md:hidden

@@ -3,81 +3,108 @@ import { Link } from 'react-router-dom';
 
 const Hero = () => {
   return (
-    <section className="relative pt-24 pb-12 sm:pt-32 sm:pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 top-0 w-full h-full bg-hero-glow pointer-events-none z-0"></div>
-      <div className="absolute top-20 right-[-50px] sm:right-0 w-[200px] h-[200px] sm:w-[400px] sm:h-[400px] bg-blue-600/10 rounded-full blur-[80px] pointer-events-none"></div>
-      <div className="absolute bottom-0 left-[-50px] sm:left-0 w-[200px] h-[200px] sm:w-[400px] sm:h-[400px] bg-purple-600/10 rounded-full blur-[80px] pointer-events-none"></div>
+    <section className="relative pt-24 pb-12 sm:pt-32 sm:pb-20 md:pt-40 md:pb-28 px-4 sm:px-6 overflow-hidden min-h-screen flex flex-col justify-center">
 
-      <div className="relative z-10 w-full max-w-4xl mx-auto text-center flex flex-col items-center gap-6 sm:gap-8">
+      {/* --- Advanced Background Visualization --- */}
+      <div className="absolute inset-0 bg-[#0B0B15] z-0">
+        {/* Main Gradient Mesh */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#1f6b7a]/20 rounded-full blur-[120px] animate-pulse-slow"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse-slow delay-1000"></div>
+        <div className="absolute top-[40%] left-[30%] w-[30%] h-[30%] bg-blue-600/10 rounded-full blur-[100px] animate-pulse-slow delay-2000"></div>
 
-        {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-primary/30 backdrop-blur-sm">
-          <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-          <span className="text-[10px] xs:text-xs font-medium text-gray-300 uppercase tracking-wider font-sans">
-            NOW WITH AI FRAUD DETECTION
+        {/* Grid Pattern Overlay */}
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+        <div className="absolute inset-0 opacity-20"
+          style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
+        </div>
+      </div>
+
+      <div className="relative z-10 w-full max-w-5xl mx-auto text-center flex flex-col items-center gap-8">
+
+        {/* Badge - Neater Look */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-lg hover:border-primary/50 transition-colors group cursor-default">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+          </span>
+          <span className="text-xs font-bold text-gray-300 tracking-widest uppercase group-hover:text-primary transition-colors">
+            AI-Powered Recruitment
           </span>
         </div>
 
-        {/* Headline */}
-        <h1 className="text-4xl xs:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight text-white font-sans px-2">
-          Get Hired By Skills, <br className="hidden sm:block" />
-          <span className="text-primary text-glow block sm:inline mt-2 sm:mt-0">Not Just Resumes</span>
+        {/* Headline - Mixed Shades & Gradient */}
+        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tighter text-white font-sans text-center">
+          Hire by <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1f6b7a] via-cyan-400 to-blue-500 animate-gradient-x">Skills</span>, <br />
+          <span className="relative">
+            Not Resumes
+            {/* Underline Decoration */}
+            <svg className="absolute -bottom-2 w-full h-3 text-primary opacity-50" viewBox="0 0 100 10" preserveAspectRatio="none">
+              <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="2" fill="none" />
+            </svg>
+          </span>
         </h1>
 
-        {/* Subheadline */}
-        <p className="text-base xs:text-lg text-gray-400 max-w-2xl font-normal leading-relaxed px-4 font-sans">
-          Leverage our ML-powered engine to verify skills and detect fraud instantly. Experience the future of recruitment where potential meets opportunity.
+        {/* Subheadline - Better Contrast */}
+        <p className="text-lg sm:text-xl text-gray-400 max-w-2xl font-medium leading-relaxed px-4">
+          Replace guesswork with <span className="text-white font-bold">verified data</span>. Our ML engine validates candidate skills in real-time, ensuring you never miss top talent.
         </p>
 
-        {/* Buttons */}
-        <div className="flex flex-col xs:flex-row gap-4 w-full justify-center px-4 pt-4">
-          <Link to="/auth" className="w-full xs:w-auto">
-            <button
-              className="bg-primary hover:bg-primary-glow text-white font-bold px-8 h-12 rounded-lg text-base w-full xs:w-auto flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(31,107,122,0.4)] hover:shadow-[0_0_30px_rgba(31,107,122,0.6)] transition-all border border-white/10 font-sans"
-              type="button"
-            >
-              <span className="material-symbols-outlined text-[20px]">rocket_launch</span>
-              Start Hiring
+        {/* Buttons - Modern Glassmorphism */}
+        <div className="flex flex-col sm:flex-row items-center gap-5 w-full justify-center pt-6">
+          <Link to="/auth">
+            <button className="group relative px-8 py-4 bg-primary text-white font-bold rounded-xl overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(31,107,122,0.6)]">
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+              <div className="relative flex items-center gap-2">
+                <span className="material-symbols-outlined">rocket_launch</span>
+                <span>Start Hiring Now</span>
+              </div>
             </button>
           </Link>
-          <Link to="/auth" className="w-full xs:w-auto">
-            <button
-              className="glass-button text-white px-8 h-12 rounded-lg text-base font-bold w-full xs:w-auto flex items-center justify-center gap-2 border border-white/10 hover:bg-white/5 font-sans"
-              type="button"
-            >
-              <span className="material-symbols-outlined text-[20px]">search</span>
-              Find a Job
+          <Link to="/auth">
+            <button className="group px-8 py-4 bg-white/5 text-white font-bold rounded-xl border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all hover:scale-105 backdrop-blur-sm flex items-center gap-2">
+              <span className="material-symbols-outlined text-gray-400 group-hover:text-white transition-colors">search</span>
+              <span>Find a Job</span>
             </button>
           </Link>
         </div>
       </div>
 
-      {/* Dashboard Preview */}
-      <div className="relative z-10 mt-12 xs:mt-16 max-w-5xl mx-auto rounded-xl border border-white/10 glass-panel p-2 shadow-2xl bg-[#2a2e37]/40 backdrop-blur-xl">
-        <div className="aspect-[16/9] w-full bg-[#15171c] rounded-lg overflow-hidden relative">
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-60 mix-blend-screen"
-            style={{
-              backgroundImage:
-                "url('https://placehold.co/1200x800/15171c/3b82f6?text=Live+Data+Visualization')",
-            }}
-          ></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#15171c] via-transparent to-transparent"></div>
+      {/* Dashboard Preview - The Visualization Piece */}
+      <div className="relative z-10 mt-20 max-w-6xl mx-auto">
 
-          <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-8 sm:right-8 flex justify-between items-end">
-            <div>
-              <div className="text-[10px] sm:text-xs text-primary font-mono mb-1">LIVE ANALYSIS</div>
-              <div className="text-lg sm:text-2xl font-bold text-white">98.4% Match Accuracy</div>
+        <div className="relative rounded-2xl border border-white/10 bg-[#15171c]/80 backdrop-blur-xl shadow-2xl overflow-hidden group transform transition-transform hover:scale-[1.01] duration-500">
+
+          {/* Header Bar simulation */}
+          <div className="h-8 bg-[#1a1d23] border-b border-white/5 flex items-center px-4 gap-2">
+            <div className="flex gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
             </div>
-            <div className="flex gap-2">
-              <div className="size-8 sm:size-10 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
-                <span className="material-symbols-outlined text-xs sm:text-sm">analytics</span>
+            <div className="ml-4 h-4 w-32 bg-white/5 rounded-full"></div>
+          </div>
+
+          <div className="aspect-[16/9] w-full bg-[#0B0B15] relative group-hover:bg-[#0f1115] transition-colors duration-500">
+            {/* The Image (Preserved) */}
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-normal transition-opacity group-hover:opacity-100"
+              style={{
+                backgroundImage: "url('https://placehold.co/1200x800/15171c/3b82f6?text=Live+Data+Visualization')",
+              }}
+            ></div>
+
+            {/* Modern Gradient Overlay (Color Grading) */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B15] via-transparent to-transparent opacity-90"></div>
+
+            {/* Simple Overlay Badge */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 px-5 py-2.5 bg-[#15171c]/90 backdrop-blur-md border border-white/10 rounded-full shadow-lg">
+              <div className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
               </div>
-              <div className="size-8 sm:size-10 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center">
-                <span className="material-symbols-outlined text-xs sm:text-sm">security</span>
-              </div>
+              <span className="text-sm font-bold text-white tracking-wide">98.4% Match Accuracy</span>
             </div>
+
           </div>
         </div>
       </div>

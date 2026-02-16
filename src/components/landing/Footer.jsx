@@ -1,9 +1,51 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+
+const MagneticLink = ({ children, href, className }) => {
+  const ref = useRef(null);
+  const position = { x: useMotionValue(0), y: useMotionValue(0) };
+
+  const handleMouse = (e) => {
+    const { clientX, clientY } = e;
+    const { height, width, left, top } = ref.current.getBoundingClientRect();
+    const middleX = clientX - (left + width / 2);
+    const middleY = clientY - (top + height / 2);
+    position.x.set(middleX * 0.3); // Magnetic strength
+    position.y.set(middleY * 0.3);
+  };
+
+  const reset = () => {
+    position.x.set(0);
+    position.y.set(0);
+  };
+
+  const { x, y } = position;
+  return (
+    <motion.a
+      ref={ref}
+      href={href}
+      className={`relative inline-block ${className}`}
+      onMouseMove={handleMouse}
+      onMouseLeave={reset}
+      animate={{ x: 0, y: 0 }}
+      style={{ x, y }}
+      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+    >
+      {children}
+    </motion.a>
+  );
+};
 
 const Footer = () => {
   return (
-    <footer className="bg-surface-darker pt-12 xs:pt-16 sm:pt-20 pb-8 xs:pb-10 border-t border-white/5">
-      <div className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6">
+    <footer className="bg-surface-darker pt-12 xs:pt-16 sm:pt-20 pb-8 xs:pb-10 border-t border-white/5 overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+        className="max-w-7xl mx-auto px-3 xs:px-4 sm:px-6"
+      >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 xs:gap-10 sm:gap-12 mb-12 xs:mb-16">
           {/* Logo & Description */}
           <div className="col-span-1 sm:col-span-2 flex flex-col">
@@ -16,8 +58,10 @@ const Footer = () => {
             <p className="text-gray-500 max-w-xs xs:max-w-sm mb-6 xs:mb-8 text-sm xs:text-base">
               The first AI-native recruitment platform built for the future of work. Verify skills, detect fraud, and hire faster.
             </p>
-            <form
-              className="glass-panel p-1 rounded-lg flex flex-col xs:flex-row items-stretch xs:items-center gap-2 xs:gap-0 max-w-full xs:max-w-md w-full"
+            <motion.form
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="glass-panel p-1 rounded-lg flex flex-col xs:flex-row items-stretch xs:items-center gap-2 xs:gap-0 max-w-full xs:max-w-md w-full border border-white/10 hover:border-primary/30 transition-colors"
               onSubmit={e => e.preventDefault()}
             >
               <input
@@ -31,7 +75,7 @@ const Footer = () => {
               >
                 Subscribe
               </button>
-            </form>
+            </motion.form>
           </div>
           {/* Platform Links */}
           <div>
@@ -39,7 +83,7 @@ const Footer = () => {
             <ul className="flex flex-col gap-3 xs:gap-4 text-gray-400 text-sm">
               {['For Talent', 'For Recruiters', 'Enterprise', 'Pricing'].map(item => (
                 <li key={item}>
-                  <a className="hover:text-primary transition-colors" href="#">{item}</a>
+                  <MagneticLink className="hover:text-primary transition-colors" href="#">{item}</MagneticLink>
                 </li>
               ))}
             </ul>
@@ -50,7 +94,7 @@ const Footer = () => {
             <ul className="flex flex-col gap-3 xs:gap-4 text-gray-400 text-sm">
               {['About Us', 'Careers', 'Legal', 'Contact'].map(item => (
                 <li key={item}>
-                  <a className="hover:text-primary transition-colors" href="#">{item}</a>
+                  <MagneticLink className="hover:text-primary transition-colors" href="#">{item}</MagneticLink>
                 </li>
               ))}
             </ul>
@@ -59,19 +103,19 @@ const Footer = () => {
         {/* Divider & Bottom Section */}
         <div className="border-t border-white/5 pt-6 xs:pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-600 text-xs xs:text-sm text-center md:text-left font-sans">© 2026 SkillHire Inc. All rights reserved.</p>
-          <div className="flex gap-3 xs:gap-4 text-gray-500">
-            <a className="hover:text-white transition-colors" href="#" aria-label="Website">
+          <div className="flex gap-4 xs:gap-6 text-gray-500">
+            <MagneticLink className="hover:text-white transition-colors" href="#" aria-label="Website">
               <span className="material-symbols-outlined text-base xs:text-lg">public</span>
-            </a>
-            <a className="hover:text-white transition-colors" href="#" aria-label="Share">
+            </MagneticLink>
+            <MagneticLink className="hover:text-white transition-colors" href="#" aria-label="Share">
               <span className="material-symbols-outlined text-base xs:text-lg">share</span>
-            </a>
-            <a className="hover:text-white transition-colors" href="#" aria-label="RSS">
+            </MagneticLink>
+            <MagneticLink className="hover:text-white transition-colors" href="#" aria-label="RSS">
               <span className="material-symbols-outlined text-base xs:text-lg">rss_feed</span>
-            </a>
+            </MagneticLink>
           </div>
         </div>
-      </div>
+      </motion.div>
     </footer>
   );
 };

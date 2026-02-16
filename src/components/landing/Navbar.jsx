@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -15,15 +16,20 @@ const Navbar = () => {
 
   return (
     // Main Navbar - Added solid background color to prevent see-through on scroll
-    <nav className="fixed top-0 left-0 right-0 w-full z-50 bg-[#1a1d23] border-b border-white/5 transition-all duration-300">
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="fixed top-0 left-0 right-0 w-full z-50 bg-[#1a1d23] border-b border-white/5 transition-all duration-300"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-4">
 
         {/* Logo - Left aligned */}
-        <Link to="/" className="flex items-center gap-3 shrink-0">
-          <div className="size-8 sm:size-9 flex items-center justify-center bg-primary/20 text-primary rounded-full border border-primary/30">
+        <Link to="/" className="flex items-center gap-3 shrink-0 group">
+          <div className="size-8 sm:size-9 flex items-center justify-center bg-primary/20 text-primary rounded-full border border-primary/30 group-hover:border-primary/50 transition-colors">
             <span className="material-symbols-outlined text-[18px] sm:text-[20px] font-semibold">psychology</span>
           </div>
-          <h2 className="text-white text-lg sm:text-xl font-bold tracking-tight font-sans">SkillHire</h2>
+          <h2 className="text-white text-lg sm:text-xl font-bold tracking-tight font-sans whitespace-nowrap">SkillHire</h2>
         </Link>
 
         {/* Desktop Navigation - Center-right */}
@@ -102,7 +108,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 
 const trustedCompanies = [
   { icon: 'diamond', name: 'AcmeCorp' },
@@ -15,13 +16,26 @@ const TrustedBy = () => {
         <p className="text-xs font-bold text-gray-500 mb-8 uppercase tracking-[0.2em] font-sans">
           Trusted by forward-thinking teams
         </p>
-        <div className="flex flex-wrap justify-center items-center gap-x-12 sm:gap-x-16 gap-y-8 opacity-50 hover:opacity-100 transition-opacity duration-700">
-          {trustedCompanies.map((company) => (
-            <div key={company.name} className="flex items-center gap-2 font-bold text-lg text-white font-sans group cursor-default">
-              <span className="material-symbols-outlined text-2xl text-gray-400 group-hover:text-primary transition-colors duration-500">{company.icon}</span>
-              <span className="group-hover:text-white transition-colors duration-500">{company.name}</span>
-            </div>
-          ))}
+        <div className="relative overflow-hidden mask-linear-fade">
+          <motion.div
+            className="flex gap-12 sm:gap-16 items-center whitespace-nowrap"
+            animate={{ x: [0, -1000] }}
+            transition={{
+              x: {
+                repeat: Infinity,
+                repeatType: "loop",
+                duration: 25,
+                ease: "linear",
+              },
+            }}
+          >
+            {[...trustedCompanies, ...trustedCompanies, ...trustedCompanies].map((company, idx) => (
+              <div key={`${company.name}-${idx}`} className="flex items-center gap-2 font-bold text-lg text-white font-sans group cursor-default opacity-50 hover:opacity-100 transition-opacity duration-300">
+                <span className="material-symbols-outlined text-2xl text-gray-400 group-hover:text-primary transition-colors duration-500">{company.icon}</span>
+                <span className="group-hover:text-white transition-colors duration-500">{company.name}</span>
+              </div>
+            ))}
+          </motion.div>
         </div>
       </div>
     </section>

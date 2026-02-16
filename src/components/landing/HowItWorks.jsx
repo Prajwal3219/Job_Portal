@@ -23,7 +23,7 @@ const HowItWorks = () => {
   const containerRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start end", "end start"]
+    offset: ["start 80%", "end 20%"]
   });
 
   const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
@@ -83,11 +83,33 @@ const HowItWorks = () => {
                   transition={{ duration: 0.8, ease: "easeOut" }}
                   className={`w-full md:w-1/2 text-center md:text-left ${idx % 2 !== 0 ? 'md:pl-16' : 'md:pr-16 md:text-right'}`}
                 >
-                  <div className="inline-block p-2 rounded-lg bg-surface-dark border border-white/5 mb-4 shadow-sm">
-                    <span className="text-xs font-bold text-primary font-mono">0{idx + 1}</span>
-                  </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-4 tracking-tight">{step.title}</h3>
-                  <p className="text-gray-400 text-base sm:text-lg leading-relaxed">{step.desc}</p>
+                  <motion.div
+                    className="inline-block"
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  >
+                    <div className="inline-block p-2 rounded-lg bg-surface-dark border border-white/5 mb-4 shadow-sm">
+                      <span className="text-xs font-bold text-primary font-mono">0{idx + 1}</span>
+                    </div>
+                  </motion.div>
+
+                  <motion.h3
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="text-2xl sm:text-3xl font-bold text-white mb-4 tracking-tight hover:text-primary transition-colors duration-300 cursor-default"
+                  >
+                    {step.title}
+                  </motion.h3>
+
+                  <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.5 }}
+                    className="text-gray-400 text-base sm:text-lg leading-relaxed"
+                  >
+                    {step.desc}
+                  </motion.p>
                 </motion.div>
 
                 {/* Image Section Animation */}
@@ -98,15 +120,19 @@ const HowItWorks = () => {
                   transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
                   className={`w-full md:w-1/2 ${idx % 2 !== 0 ? 'md:pr-16' : 'md:pl-16'}`}
                 >
-                  <div className="w-full aspect-video rounded-xl bg-[#15171c]/50 backdrop-blur-sm border border-white/10 overflow-hidden relative shadow-2xl group hover:border-primary/30 transition-all duration-500 transform hover:scale-[1.02]">
+                  <motion.div
+                    whileHover={{ scale: 1.03, rotate: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="w-full aspect-video rounded-xl bg-[#15171c]/50 backdrop-blur-sm border border-white/10 overflow-hidden relative shadow-2xl group hover:border-primary/30 transition-all duration-500"
+                  >
                     <img
                       src={step.image}
                       alt={step.title}
-                      className="object-cover w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-500"
+                      className="object-cover w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-500 scale-100 group-hover:scale-105"
                     />
                     {/* Gradient Overlay for integration */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#15171c] via-transparent to-transparent opacity-60"></div>
-                  </div>
+                  </motion.div>
                 </motion.div>
               </div>
             ))}

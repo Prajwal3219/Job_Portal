@@ -131,13 +131,72 @@ const Hero = () => {
           </div>
 
           <div className="aspect-[16/9] w-full bg-[#0B0B15] relative group-hover:bg-[#0f1115] transition-colors duration-500">
-            {/* The Image (Preserved) */}
-            <div
-              className="absolute inset-0 bg-cover bg-center opacity-80 mix-blend-normal transition-opacity group-hover:opacity-100"
-              style={{
-                backgroundImage: "url('https://placehold.co/1200x800/15171c/3b82f6?text=Live+Data+Visualization')",
-              }}
-            ></div>
+            {/* Animated Data Visualization (Replaces Static Image) */}
+            <div className="absolute inset-0 bg-[#0B0B15]">
+              {/* Subtle Grid Background */}
+              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
+
+              {/* Animated Waves */}
+              <div className="absolute inset-0 flex items-end opacity-60">
+                <svg className="w-full h-[60%]" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="waveGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#1f6b7a" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.1" />
+                    </linearGradient>
+                    <linearGradient id="waveGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.4" />
+                      <stop offset="100%" stopColor="#ec4899" stopOpacity="0.1" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Wave 1 */}
+                  <motion.path
+                    fill="url(#waveGradient1)"
+                    animate={{
+                      d: [
+                        "M0,160 C320,300,420,300,740,160 C1060,20,1120,20,1440,160 V320 H0 Z",
+                        "M0,160 C320,20,420,20,740,160 C1060,300,1120,300,1440,160 V320 H0 Z",
+                        "M0,160 C320,300,420,300,740,160 C1060,20,1120,20,1440,160 V320 H0 Z"
+                      ]
+                    }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                  />
+
+                  {/* Wave 2 (Offset) */}
+                  <motion.path
+                    fill="url(#waveGradient2)"
+                    animate={{
+                      d: [
+                        "M0,192 C320,64,420,64,740,192 C1060,320,1120,320,1440,192 V320 H0 Z",
+                        "M0,192 C320,320,420,320,740,192 C1060,64,1120,64,1440,192 V320 H0 Z",
+                        "M0,192 C320,64,420,64,740,192 C1060,320,1120,320,1440,192 V320 H0 Z"
+                      ]
+                    }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                </svg>
+              </div>
+
+              {/* Floating "Data Points" */}
+              {[...Array(6)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-1.5 h-1.5 rounded-full bg-white blur-[1px]"
+                  initial={{ x: Math.random() * 100 + "%", y: Math.random() * 100 + "%", opacity: 0 }}
+                  animate={{
+                    y: [null, Math.random() * -50],
+                    opacity: [0, 1, 0]
+                  }}
+                  transition={{
+                    duration: 3 + Math.random() * 2,
+                    repeat: Infinity,
+                    ease: "linear",
+                    delay: Math.random() * 2
+                  }}
+                />
+              ))}
+            </div>
 
             {/* Modern Gradient Overlay (Color Grading) */}
             <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B15] via-transparent to-transparent opacity-90"></div>

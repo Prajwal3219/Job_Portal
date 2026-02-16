@@ -182,7 +182,7 @@ const RecruiterInterviews = () => {
                                     {/* Action Buttons */}
                                     <div className="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
                                         <button className="flex-1 md:flex-none py-2 px-4 bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 rounded-lg text-sm font-medium transition-all">
-                                            Resumé
+                                            Resume
                                         </button>
                                         <button className="flex-1 md:flex-none py-2 px-5 bg-[#1f6b7a] hover:bg-[#185662] text-white rounded-lg text-sm font-bold shadow-lg shadow-[#1f6b7a]/20 hover:shadow-[#1f6b7a]/40 transition-all flex items-center justify-center gap-2">
                                             <Video size={16} />

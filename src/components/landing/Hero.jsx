@@ -1,5 +1,29 @@
-import React from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Stars, Float, Sphere, MeshDistortMaterial } from '@react-three/drei';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+const AnimatedBackground = () => {
+  return (
+    <Canvas camera={{ position: [0, 0, 1] }}>
+      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[10, 10, 5]} intensity={1} />
+      <Float speed={2} rotationIntensity={1} floatIntensity={2}>
+        <mesh position={[1, -0.5, -2]}>
+          <sphereGeometry args={[1.5, 32, 32]} />
+          <MeshDistortMaterial color="#1f6b7a" speed={2} distort={0.4} radius={1} transparent opacity={0.3} wireframe />
+        </mesh>
+      </Float>
+      <Float speed={3} rotationIntensity={2} floatIntensity={1}>
+        <mesh position={[-2, 1, -3]}>
+          <icosahedronGeometry args={[1, 0]} />
+          <meshStandardMaterial color="#8b5cf6" wireframe transparent opacity={0.2} />
+        </mesh>
+      </Float>
+    </Canvas>
+  );
+};
 
 const Hero = () => {
   return (
@@ -7,22 +31,24 @@ const Hero = () => {
 
       {/* --- Advanced Background Visualization --- */}
       <div className="absolute inset-0 bg-[#0B0B15] z-0">
-        {/* Main Gradient Mesh */}
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#1f6b7a]/20 rounded-full blur-[120px] animate-pulse-slow"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/20 rounded-full blur-[120px] animate-pulse-slow delay-1000"></div>
-        <div className="absolute top-[40%] left-[30%] w-[30%] h-[30%] bg-blue-600/10 rounded-full blur-[100px] animate-pulse-slow delay-2000"></div>
-
-        {/* Grid Pattern Overlay */}
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
-        <div className="absolute inset-0 opacity-20"
-          style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
+        <div className="absolute inset-0 opacity-40">
+          <AnimatedBackground />
         </div>
+
+        {/* Main Gradient Mesh (Subtle Overlay) */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#1f6b7a]/10 rounded-full blur-[120px] animate-pulse-slow pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/10 rounded-full blur-[120px] animate-pulse-slow delay-1000 pointer-events-none"></div>
       </div>
 
       <div className="relative z-10 w-full max-w-5xl mx-auto text-center flex flex-col items-center gap-8">
 
         {/* Badge - Neater Look */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-lg hover:border-primary/50 transition-colors group cursor-default">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-lg hover:border-primary/50 transition-colors group cursor-default"
+        >
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -30,10 +56,15 @@ const Hero = () => {
           <span className="text-xs font-bold text-gray-300 tracking-widest uppercase group-hover:text-primary transition-colors">
             AI-Powered Recruitment
           </span>
-        </div>
+        </motion.div>
 
         {/* Headline - Mixed Shades & Gradient */}
-        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tighter text-white font-sans text-center">
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-[1.1] tracking-tighter text-white font-sans text-center"
+        >
           Hire by <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1f6b7a] via-cyan-400 to-blue-500 animate-gradient-x">Skills</span>, <br />
           <span className="relative">
             Not Resumes
@@ -42,15 +73,25 @@ const Hero = () => {
               <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="2" fill="none" />
             </svg>
           </span>
-        </h1>
+        </motion.h1>
 
         {/* Subheadline - Better Contrast */}
-        <p className="text-lg sm:text-xl text-gray-400 max-w-2xl font-medium leading-relaxed px-4">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+          className="text-lg sm:text-xl text-gray-400 max-w-2xl font-medium leading-relaxed px-4"
+        >
           Replace guesswork with <span className="text-white font-bold">verified data</span>. Our ML engine validates candidate skills in real-time, ensuring you never miss top talent.
-        </p>
+        </motion.p>
 
         {/* Buttons - Modern Glassmorphism */}
-        <div className="flex flex-col sm:flex-row items-center gap-5 w-full justify-center pt-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
+          className="flex flex-col sm:flex-row items-center gap-5 w-full justify-center pt-6"
+        >
           <Link to="/auth">
             <button className="group relative px-8 py-4 bg-primary text-white font-bold rounded-xl overflow-hidden transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(31,107,122,0.6)]">
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
@@ -66,11 +107,16 @@ const Hero = () => {
               <span>Find a Job</span>
             </button>
           </Link>
-        </div>
+        </motion.div>
       </div>
 
       {/* Dashboard Preview - The Visualization Piece */}
-      <div className="relative z-10 mt-20 max-w-6xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 40 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
+        className="relative z-10 mt-20 max-w-6xl mx-auto"
+      >
 
         <div className="relative rounded-2xl border border-white/10 bg-[#15171c]/80 backdrop-blur-xl shadow-2xl overflow-hidden group transform transition-transform hover:scale-[1.01] duration-500">
 
@@ -107,7 +153,7 @@ const Hero = () => {
 
           </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

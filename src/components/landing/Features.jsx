@@ -1,6 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const Features = () => {
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+
+  // Helper to determine styles based on hover state
+  const getCardStyle = (index) => {
+    const isHovered = hoveredIndex === index;
+    const isAnyHovered = hoveredIndex !== null;
+
+    // Base transition for smooth animation
+    let style = "transition-all duration-500 ease-in-out ";
+
+    if (isAnyHovered && !isHovered) {
+      // Blur and fade others
+      style += "blur-[2px] opacity-40 scale-[0.98] grayscale-[0.5]";
+    } else if (isHovered) {
+      // Highlight selected
+      style += "opacity-100 scale-[1.02] z-10 shadow-2xl ring-1 ring-white/20";
+    } else {
+      // Default state
+      style += "opacity-100 scale-100";
+    }
+
+    return style;
+  };
+
   return (
     <section className="py-24 px-4 sm:px-6 relative overflow-hidden">
 
@@ -28,7 +52,11 @@ const Features = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-auto md:auto-rows-[300px]">
 
           {/* Card 1: Skill Verification (Tall Card) */}
-          <div className="md:col-span-2 md:row-span-2 bg-[#15171c]/60 backdrop-blur-xl rounded-3xl border border-white/10 p-8 relative overflow-hidden group hover:border-primary/50 hover:shadow-[0_0_30px_rgba(31,107,122,0.1)] transition-all duration-500">
+          <div
+            className={`md:col-span-2 md:row-span-2 bg-[#15171c]/60 backdrop-blur-xl rounded-3xl border border-white/10 p-8 relative overflow-hidden group hover:border-primary/50 hover:shadow-[0_0_30px_rgba(31,107,122,0.1)] ${getCardStyle(0)}`}
+            onMouseEnter={() => setHoveredIndex(0)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
             <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
             <div className="relative z-10 h-full flex flex-col justify-between">
@@ -58,7 +86,11 @@ const Features = () => {
           </div>
 
           {/* Card 2: Fraud Detection */}
-          <div className="md:col-span-1 md:row-span-1 bg-[#15171c]/60 backdrop-blur-xl rounded-3xl border border-white/10 p-8 relative overflow-hidden group hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(239,68,68,0.1)] transition-all duration-500">
+          <div
+            className={`md:col-span-1 md:row-span-1 bg-[#15171c]/60 backdrop-blur-xl rounded-3xl border border-white/10 p-8 relative overflow-hidden group hover:border-red-500/50 hover:shadow-[0_0_30px_rgba(239,68,68,0.1)] ${getCardStyle(1)}`}
+            onMouseEnter={() => setHoveredIndex(1)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
             <div className="absolute -right-10 -top-10 w-32 h-32 bg-red-500/10 rounded-full blur-2xl group-hover:bg-red-500/20 transition-colors"></div>
 
             <div className="relative z-10">
@@ -71,7 +103,11 @@ const Features = () => {
           </div>
 
           {/* Card 3: ML Matching */}
-          <div className="md:col-span-1 md:row-span-1 bg-[#15171c]/60 backdrop-blur-xl rounded-3xl border border-white/10 p-8 relative overflow-hidden group hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] transition-all duration-500">
+          <div
+            className={`md:col-span-1 md:row-span-1 bg-[#15171c]/60 backdrop-blur-xl rounded-3xl border border-white/10 p-8 relative overflow-hidden group hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] ${getCardStyle(2)}`}
+            onMouseEnter={() => setHoveredIndex(2)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
             <div className="absolute -right-10 -bottom-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl group-hover:bg-blue-500/20 transition-colors"></div>
 
             <div className="relative z-10">
@@ -84,7 +120,11 @@ const Features = () => {
           </div>
 
           {/* Card 4: Instant Hiring Flows */}
-          <div className="md:col-span-3 md:row-span-1 bg-[#15171c]/60 backdrop-blur-xl rounded-3xl border border-white/10 p-8 flex flex-col md:flex-row items-center gap-10 relative overflow-hidden group hover:border-yellow-500/50 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] transition-all duration-500">
+          <div
+            className={`md:col-span-3 md:row-span-1 bg-[#15171c]/60 backdrop-blur-xl rounded-3xl border border-white/10 p-8 flex flex-col md:flex-row items-center gap-10 relative overflow-hidden group hover:border-yellow-500/50 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] ${getCardStyle(3)}`}
+            onMouseEnter={() => setHoveredIndex(3)}
+            onMouseLeave={() => setHoveredIndex(null)}
+          >
 
             <div className="relative z-10 flex-1">
               <div className="size-12 rounded-xl bg-[#0B0B15] border border-white/10 flex items-center justify-center mb-6 text-yellow-400 shadow-lg group-hover:scale-110 transition-transform">

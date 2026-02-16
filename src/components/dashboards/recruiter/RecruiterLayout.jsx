@@ -57,10 +57,10 @@ const Sidebar = ({ isOpen, onClose }) => {
 
                 <div className="pt-4 mt-4 border-t border-white/5">
                     <p className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Admin</p>
-                    <a href="#" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm font-medium transition-all group">
+                    <Link to="/dashboard/recruiter/company-profile" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm font-medium transition-all group">
                         <span className="material-symbols-outlined text-[20px] group-hover:text-[#1f6b7a] transition-colors">domain</span>
                         Company Profile
-                    </a>
+                    </Link>
                     <Link to="/dashboard/recruiter/settings" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 text-sm font-medium transition-all group">
                         <span className="material-symbols-outlined text-[20px] group-hover:text-[#1f6b7a] transition-colors">settings</span>
                         Settings

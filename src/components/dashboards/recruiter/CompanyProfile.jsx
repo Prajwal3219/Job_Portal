@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 
 const CompanyProfile = () => {
-    const { setSidebarOpen } = useOutletContext();
+    const context = useOutletContext();
+    const setSidebarOpen = context.setSidebarOpen || context.setIsSidebarOpen;
 
     // Mock Data
     const techStack = [

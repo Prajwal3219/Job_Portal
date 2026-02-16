@@ -130,6 +130,11 @@ function App() {
                 <RecruiterMessages />
               </PageTransition>
             } />
+            <Route path="company-profile" element={
+              <PageTransition>
+                <CompanyProfile />
+              </PageTransition>
+            } />
             <Route path="settings" element={
               <PageTransition>
                 <RecruiterSettings />

@@ -19,6 +19,7 @@ import CandidateProfileBuilder from './components/dashboards/candidate/Candidate
 import CandidateSettings from './components/dashboards/candidate/CandidateSettings';
 import RecruiterLayout from './components/dashboards/recruiter/RecruiterLayout'; // New Layout
 import CompanyProfile from './components/dashboards/recruiter/CompanyProfile'; // New Page
+import RecruiterInterviews from './components/dashboards/recruiter/RecruiterInterviews'; // New Page
 import RecruiterDashboard from './components/dashboards/recruiter/RecruiterDashboard';
 import RecruiterApplications from './components/dashboards/recruiter/RecruiterApplications'; // New Page
 import RecruiterJobs from './components/dashboards/recruiter/RecruiterJobs'; // New Page
@@ -128,6 +129,11 @@ function App() {
             <Route path="messages" element={
               <PageTransition>
                 <RecruiterMessages />
+              </PageTransition>
+            } />
+            <Route path="interviews" element={
+              <PageTransition>
+                <RecruiterInterviews />
               </PageTransition>
             } />
             <Route path="company-profile" element={

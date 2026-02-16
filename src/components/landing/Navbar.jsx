@@ -14,6 +14,38 @@ const Navbar = () => {
     }
   }, [isMobileMenuOpen]);
 
+  // Letter animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: (i = 1) => ({
+      opacity: 1,
+      transition: { staggerChildren: 0.12, delayChildren: 0.04 * i },
+    }),
+  };
+
+  const childVariants = {
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        damping: 12,
+        stiffness: 100,
+      },
+    },
+    hidden: {
+      opacity: 0,
+      y: 20,
+      transition: {
+        type: "spring",
+        damping: 12,
+        stiffness: 100,
+      },
+    },
+  };
+
+  const text = "SkillHire";
+
   return (
     // Main Navbar - Added solid background color to prevent see-through on scroll
     <motion.nav
@@ -26,10 +58,42 @@ const Navbar = () => {
 
         {/* Logo - Left aligned */}
         <Link to="/" className="flex items-center gap-3 shrink-0 group">
-          <div className="size-8 sm:size-9 flex items-center justify-center bg-primary/20 text-primary rounded-full border border-primary/30 group-hover:border-primary/50 transition-colors">
-            <span className="material-symbols-outlined text-[18px] sm:text-[20px] font-semibold">psychology</span>
+          <div className="relative flex items-center justify-center">
+            {/* Rotating Outer Ring */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              className="size-8 sm:size-9 rounded-full border border-primary/30 border-t-primary border-r-transparent group-hover:border-primary/50 transition-colors"
+            />
+
+            {/* Pulsing Core Icon */}
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ scale: 1 }}
+              animate={{ scale: [1, 1.15, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <span className="material-symbols-outlined text-[18px] sm:text-[20px] font-semibold text-primary">psychology</span>
+            </motion.div>
           </div>
-          <h2 className="text-white text-lg sm:text-xl font-bold tracking-tight font-sans whitespace-nowrap">SkillHire</h2>
+
+          {/* Typewriter / Letter-by-Letter Animation */}
+          <motion.div
+            className="flex overflow-hidden"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {text.split("").map((letter, index) => (
+              <motion.span
+                key={index}
+                variants={childVariants}
+                className="text-white text-lg sm:text-xl font-bold tracking-tight font-sans whitespace-nowrap"
+              >
+                {letter}
+              </motion.span>
+            ))}
+          </motion.div>
         </Link>
 
         {/* Desktop Navigation - Center-right */}

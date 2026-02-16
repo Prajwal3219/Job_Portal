@@ -12,13 +12,13 @@ const AnimatedBackground = () => {
       <Float speed={2} rotationIntensity={1} floatIntensity={2}>
         <mesh position={[1, -0.5, -2]}>
           <sphereGeometry args={[1.5, 32, 32]} />
-          <MeshDistortMaterial color="#1f6b7a" speed={2} distort={0.4} radius={1} transparent opacity={0.3} wireframe />
+          <MeshDistortMaterial color="#1f6b7a" speed={2} distort={0.4} radius={1} transparent opacity={0.6} wireframe />
         </mesh>
       </Float>
       <Float speed={3} rotationIntensity={2} floatIntensity={1}>
         <mesh position={[-2, 1, -3]}>
           <icosahedronGeometry args={[1, 0]} />
-          <meshStandardMaterial color="#8b5cf6" wireframe transparent opacity={0.2} />
+          <meshStandardMaterial color="#8b5cf6" wireframe transparent opacity={0.5} />
         </mesh>
       </Float>
     </Canvas>
@@ -31,7 +31,7 @@ const Hero = () => {
 
       {/* --- Advanced Background Visualization --- */}
       <div className="absolute inset-0 bg-[#0B0B15] z-0">
-        <div className="absolute inset-0 opacity-40">
+        <div className="absolute inset-0 opacity-80">
           <AnimatedBackground />
         </div>
 

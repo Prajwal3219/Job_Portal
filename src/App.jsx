@@ -32,6 +32,7 @@ import AdminModeration from './components/dashboards/admin/AdminModeration';
 import AdminSupport from './components/dashboards/admin/AdminSupport';
 import AdminOverview from './components/dashboards/admin/AdminOverview';
 import UsersPage from './components/dashboards/admin/UsersPage';
+import AdminReports from './components/dashboards/admin/AdminReports';
 
 function App() {
   const location = useLocation();
@@ -156,6 +157,7 @@ function App() {
           }>
             <Route index element={<AdminOverview />} />
             <Route path="users" element={<UsersPage />} />
+            <Route path="reports" element={<AdminReports />} />
             <Route path="settings" element={<AdminSettings />} />
             <Route path="moderation" element={<AdminModeration />} />
             <Route path="support" element={<AdminSupport />} />

@@ -6,7 +6,8 @@ import {
     BarChart2,
     Settings,
     LogOut,
-    MessageSquare
+    MessageSquare,
+    AlertOctagon
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -18,9 +19,9 @@ const AdminSidebar = ({ isOpen, onClose }) => {
     const menuItems = [
         { icon: <LayoutGrid size={20} />, label: 'Dashboard', id: 'Dashboard', path: '/dashboard/admin' },
         { icon: <Users size={20} />, label: 'Users', id: 'Users', path: '/dashboard/admin/users' },
-        { icon: <ShieldAlert size={20} />, label: 'Moderation', id: 'Moderation', path: '/dashboard/admin/moderation', badge: 12 },
+        { icon: <ShieldAlert size={20} />, label: 'Scam Reports', id: 'Reports', path: '/dashboard/admin/reports', badge: 3 }, // Added Reports
+        { icon: <AlertOctagon size={20} />, label: 'Moderation', id: 'Moderation', path: '/dashboard/admin/moderation', badge: 12 },
         { icon: <MessageSquare size={20} />, label: 'Support Desk', id: 'Support', path: '/dashboard/admin/support', badge: 3 },
-        { icon: <BarChart2 size={20} />, label: 'Reports', id: 'Reports', path: '/dashboard/admin/reports' },
         { icon: <Settings size={20} />, label: 'Settings', id: 'Settings', path: '/dashboard/admin/settings' },
     ];
 

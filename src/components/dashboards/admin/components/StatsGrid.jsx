@@ -1,31 +1,46 @@
 ﻿import React from 'react';
-import { Users, Clock, AlertCircle, Timer } from 'lucide-react';
+import { Users, Clock, AlertCircle, Timer, TrendingUp, TrendingDown } from 'lucide-react';
 
-const StatsCard = ({ title, value, change, isPositive, extra, icon: Icon, colorClass, waveColor }) => (
-    <div className="bg-[#151A25] border border-gray-800 rounded-2xl p-5 relative overflow-hidden group hover:border-[#33ddff]/30 transition-all">
+const StatsCard = ({ title, value, change, isPositive, extra, icon: Icon, colorClass, gradientFrom, gradientTo }) => (
+    <div className={`relative overflow-hidden rounded-2xl p-6 border border-gray-800 bg-gradient-to-br from-[#151A25] to-[#0B0B15] group hover:border-[#33ddff]/30 transition-all duration-300 shadow-lg hover:shadow-[0_0_20px_rgba(51,221,255,0.05)]`}>
+
+        {/* Abstract Background Glow */}
+        <div className={`absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br ${gradientFrom} ${gradientTo} opacity-[0.03] group-hover:opacity-[0.08] blur-2xl rounded-full transition-opacity duration-500`}></div>
+
         <div className="flex justify-between items-start mb-4 relative z-10">
             <div>
-                <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">{title}</h3>
-                <div className="flex items-end gap-3">
-                    <span className="text-3xl font-bold text-white font-display">{value}</span>
-                    {change && (
-                        <span className={`text-xs font-bold mb-1.5 ${isPositive ? 'text-[#33ddff]' : 'text-red-500'}`}>
-                            {change}
-                        </span>
-                    )}
-                    {extra}
+                <h3 className="text-gray-400 text-[11px] font-bold uppercase tracking-wider mb-2">{title}</h3>
+                <div className="flex items-baseline gap-3">
+                    <span className="text-3xl font-bold text-white tracking-tight">{value}</span>
                 </div>
             </div>
-            <div className={`p-2 rounded-lg bg-[#0B0B15] border border-gray-800 ${colorClass}`}>
-                <Icon size={18} />
+            <div className={`p-2.5 rounded-xl bg-[#0B0B15] border border-gray-800 ${colorClass} shadow-inner`}>
+                <Icon size={20} strokeWidth={1.5} />
             </div>
         </div>
 
-        {/* Decorative Wave (SVG) */}
-        <div className="absolute bottom-0 left-0 right-0 h-12 opacity-30">
-            <svg viewBox="0 0 100 25" preserveAspectRatio="none" className="w-full h-full">
-                <path d="M0,25 L0,15 Q25,5 50,15 T100,10 L100,25 Z" fill="none" stroke={waveColor} strokeWidth="2" className="drop-shadow-[0_0_5px_rgba(51,221,255,0.5)]" />
-            </svg>
+        <div className="flex items-center gap-2 relative z-10">
+            {change && (
+                <div className={`flex items-center gap-1 text-xs font-bold px-2 py-0.5 rounded-md ${isPositive ? 'bg-[#33ddff]/10 text-[#33ddff] border border-[#33ddff]/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'}`}>
+                    {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                    {change}
+                </div>
+            )}
+            {extra && (
+                <div className="text-xs font-bold px-2 py-0.5 rounded-md bg-gray-800/50 text-gray-400 border border-gray-700">
+                    {extra}
+                </div>
+            )}
+            {!change && !extra && (
+                <div className="text-xs font-medium text-gray-500">
+                    Updated just now
+                </div>
+            )}
+        </div>
+
+        {/* Bottom Progress Line */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#0B0B15]">
+            <div className={`h-full ${gradientFrom.replace('from-', 'bg-')} opacity-20 w-[60%]`}></div>
         </div>
     </div>
 );
@@ -38,42 +53,46 @@ const StatsGrid = () => {
             <StatsCard
                 title="Total Users"
                 value="24,592"
-                change="+8.5%"
+                change="8.5%"
                 isPositive
                 icon={Users}
                 colorClass="text-[#33ddff]"
-                waveColor="#33ddff"
+                gradientFrom="from-[#33ddff]"
+                gradientTo="to-blue-600"
             />
 
             {/* Pending Reviews */}
             <StatsCard
                 title="Pending Reviews"
                 value="142"
-                extra={<span className="text-[10px] text-yellow-400 font-bold bg-yellow-400/10 px-1.5 py-0.5 rounded border border-yellow-400/20">+12 new</span>}
+                extra="+12 new"
                 icon={Clock}
-                colorClass="text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.2)]"
-                waveColor="#facc15"
+                colorClass="text-yellow-400"
+                gradientFrom="from-yellow-400"
+                gradientTo="to-orange-500"
             />
 
             {/* Active Reports */}
             <StatsCard
                 title="Active Reports"
                 value="28"
-                extra={<span className="text-[10px] text-red-500 font-bold bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/20">+5 critical</span>}
+                extra="+5 critical"
                 icon={AlertCircle}
-                colorClass="text-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]"
-                waveColor="#ef4444"
+                colorClass="text-red-500"
+                gradientFrom="from-red-500"
+                gradientTo="to-pink-600"
             />
 
             {/* Avg Resolution */}
             <StatsCard
                 title="Avg Resolution"
                 value="4h 12m"
-                change="-15m"
-                isPositive
+                change="15m"
+                isPositive={true}
                 icon={Timer}
-                colorClass="text-gray-400"
-                waveColor="#9ca3af"
+                colorClass="text-purple-400"
+                gradientFrom="from-purple-400"
+                gradientTo="to-indigo-500"
             />
 
         </div>
@@ -81,4 +100,5 @@ const StatsGrid = () => {
 };
 
 export default StatsGrid;
+
 

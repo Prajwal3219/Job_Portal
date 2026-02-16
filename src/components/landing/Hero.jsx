@@ -110,106 +110,27 @@ const Hero = () => {
         </motion.div>
       </div>
 
-      {/* Dashboard Preview - The Visualization Piece */}
+      {/* Steve Jobs Quote - Elegant & Minimal */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 40 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
-        className="relative z-10 mt-20 max-w-6xl mx-auto"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 1, ease: "easeOut" }}
+        className="relative z-10 mt-24 max-w-4xl mx-auto text-center"
       >
+        <div className="relative p-8 sm:p-12 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-sm overflow-hidden group hover:bg-white/10 transition-colors duration-500">
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-[80px] group-hover:bg-primary/30 transition-colors"></div>
+          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-500/20 rounded-full blur-[80px] group-hover:bg-purple-500/30 transition-colors"></div>
 
-        <div className="relative rounded-2xl border border-white/10 bg-[#15171c]/80 backdrop-blur-xl shadow-2xl overflow-hidden group transform transition-transform hover:scale-[1.01] duration-500">
+          <span className="material-symbols-outlined text-6xl text-white/20 mb-6 block">format_quote</span>
 
-          {/* Header Bar simulation */}
-          <div className="h-8 bg-[#1a1d23] border-b border-white/5 flex items-center px-4 gap-2">
-            <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
-              <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
-            </div>
-            <div className="ml-4 h-4 w-32 bg-white/5 rounded-full"></div>
-          </div>
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif italic text-white/90 leading-relaxed mb-6">
+            "The only way to do great work is to love what you do."
+          </h3>
 
-          <div className="aspect-[16/9] w-full bg-[#0B0B15] relative group-hover:bg-[#0f1115] transition-colors duration-500">
-            {/* Animated Data Visualization (Replaces Static Image) */}
-            <div className="absolute inset-0 bg-[#0B0B15]">
-              {/* Subtle Grid Background */}
-              <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:50px_50px]"></div>
-
-              {/* Animated Waves */}
-              <div className="absolute inset-0 flex items-end opacity-60">
-                <svg className="w-full h-[60%]" viewBox="0 0 1440 320" preserveAspectRatio="none">
-                  <defs>
-                    <linearGradient id="waveGradient1" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#1f6b7a" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.1" />
-                    </linearGradient>
-                    <linearGradient id="waveGradient2" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="#ec4899" stopOpacity="0.1" />
-                    </linearGradient>
-                  </defs>
-
-                  {/* Wave 1 */}
-                  <motion.path
-                    fill="url(#waveGradient1)"
-                    animate={{
-                      d: [
-                        "M0,160 C320,300,420,300,740,160 C1060,20,1120,20,1440,160 V320 H0 Z",
-                        "M0,160 C320,20,420,20,740,160 C1060,300,1120,300,1440,160 V320 H0 Z",
-                        "M0,160 C320,300,420,300,740,160 C1060,20,1120,20,1440,160 V320 H0 Z"
-                      ]
-                    }}
-                    transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-                  />
-
-                  {/* Wave 2 (Offset) */}
-                  <motion.path
-                    fill="url(#waveGradient2)"
-                    animate={{
-                      d: [
-                        "M0,192 C320,64,420,64,740,192 C1060,320,1120,320,1440,192 V320 H0 Z",
-                        "M0,192 C320,320,420,320,740,192 C1060,64,1120,64,1440,192 V320 H0 Z",
-                        "M0,192 C320,64,420,64,740,192 C1060,320,1120,320,1440,192 V320 H0 Z"
-                      ]
-                    }}
-                    transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                </svg>
-              </div>
-
-              {/* Floating "Data Points" */}
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-1.5 h-1.5 rounded-full bg-white blur-[1px]"
-                  initial={{ x: Math.random() * 100 + "%", y: Math.random() * 100 + "%", opacity: 0 }}
-                  animate={{
-                    y: [null, Math.random() * -50],
-                    opacity: [0, 1, 0]
-                  }}
-                  transition={{
-                    duration: 3 + Math.random() * 2,
-                    repeat: Infinity,
-                    ease: "linear",
-                    delay: Math.random() * 2
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Modern Gradient Overlay (Color Grading) */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B15] via-transparent to-transparent opacity-90"></div>
-
-            {/* Simple Overlay Badge */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 px-5 py-2.5 bg-[#15171c]/90 backdrop-blur-md border border-white/10 rounded-full shadow-lg">
-              <div className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-              </div>
-              <span className="text-sm font-bold text-white tracking-wide">98.4% Match Accuracy</span>
-            </div>
-
+          <div className="flex items-center justify-center gap-4">
+            <div className="h-[1px] w-12 bg-white/20"></div>
+            <p className="text-gray-400 font-bold tracking-widest uppercase text-sm">Steve Jobs</p>
+            <div className="h-[1px] w-12 bg-white/20"></div>
           </div>
         </div>
       </motion.div>

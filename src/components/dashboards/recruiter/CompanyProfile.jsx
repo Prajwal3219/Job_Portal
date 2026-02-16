@@ -3,14 +3,33 @@ import { useOutletContext } from 'react-router-dom';
 import {
     MapPin, Users, Building, CheckCircle2, Globe, Heart, Monitor,
     Briefcase, Calendar, Twitter, Linkedin, ExternalLink, ArrowRight,
-    Code2, Server, Database, Cloud, Zap, Shield, BookOpen
+    Code2, Server, Database, Cloud, Zap, Shield, BookOpen,
+    Edit2, Plus, XCircle, Camera
 } from 'lucide-react';
 
 const CompanyProfile = () => {
     const context = useOutletContext();
     const setSidebarOpen = context.setSidebarOpen || context.setIsSidebarOpen;
 
-    // Mock Data
+    // State for edit mode
+    const [isEditing, setIsEditing] = React.useState(false);
+
+    // State for Company Data
+    const [companyData, setCompanyData] = React.useState({
+        name: 'Acme Corp',
+        tagline: 'Building the next generation of cloud infrastructure for the modern web.',
+        about: `At Acme Corp, we believe that the future of technology lies in seamless integration and user-centric design. Founded in 2018, we have grown from a small garage startup to a global team of over 200 passionate engineers, designers, and thinkers.
+
+Our mission is to democratize access to powerful cloud computing resources. We are driven by a culture of innovation, collaboration, and continuous learning. We value transparency, inclusivity, and the courage to take risks.
+
+Joining our team means working on challenging problems that impact millions of users worldwide. We foster an environment where your voice is heard, and your contributions truly matter.`,
+        founded: '2018',
+        hq: 'San Francisco, CA',
+        employees: '200-500',
+        website: 'acmecorp.com'
+    });
+
+    // Mock Data (Static for now)
     const techStack = [
         { name: 'React', icon: <Code2 size={20} /> },
         { name: 'Node.js', icon: <Server size={20} /> },
@@ -33,6 +52,11 @@ const CompanyProfile = () => {
         { label: 'Learning Budget', icon: <BookOpen size={16} /> },
     ];
 
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setCompanyData(prev => ({ ...prev, [name]: value }));
+    };
+
     return (
         <>
             {/* Header */}
@@ -50,9 +74,21 @@ const CompanyProfile = () => {
                     <button className="p-2 text-gray-400 hover:text-white rounded-lg bg-[#1a1d23] border border-white/5 transition-all">
                         <Globe size={18} />
                     </button>
-                    <button className="px-4 py-2 bg-[#1f6b7a] hover:bg-[#2a8a9c] text-white text-sm font-bold rounded-lg transition-all shadow-lg shadow-[#1f6b7a]/20">
-                        Follow
-                    </button>
+                    {isEditing ? (
+                        <button
+                            onClick={() => setIsEditing(false)}
+                            className="px-4 py-2 bg-[#1f6b7a] hover:bg-[#2a8a9c] text-white text-sm font-bold rounded-lg transition-all shadow-lg shadow-[#1f6b7a]/20 flex items-center gap-2"
+                        >
+                            <CheckCircle2 size={16} /> Save Changes
+                        </button>
+                    ) : (
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white border border-white/10 text-sm font-bold rounded-lg transition-all flex items-center gap-2"
+                        >
+                            <Edit2 size={16} /> Edit Profile
+                        </button>
+                    )}
                 </div>
             </header>
 
@@ -65,27 +101,66 @@ const CompanyProfile = () => {
                         {/* Background Pattern */}
                         <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#1f6b7a_1px,transparent_1px)] [background-size:16px_16px]"></div>
                         <div className="absolute inset-0 bg-gradient-to-t from-[#15171c] to-transparent"></div>
+
+                        {/* Edit Cover Button Overlay */}
+                        {isEditing && (
+                            <div className="absolute top-4 right-4 z-20">
+                                <button className="px-3 py-1.5 bg-black/50 hover:bg-black/70 text-white text-xs font-bold rounded-lg border border-white/10 flex items-center gap-2 backdrop-blur-md transition-all">
+                                    <Camera size={14} /> Edit Cover
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 flex flex-col md:flex-row items-start md:items-end gap-6">
-                        <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-[#21242c] border-4 border-[#15171c] shadow-2xl flex items-center justify-center relative z-10">
-                            <Building size={48} className="text-[#1f6b7a]" />
+                        <div className="relative group/avatar">
+                            <div className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-[#21242c] border-4 border-[#15171c] shadow-2xl flex items-center justify-center relative z-10 overflow-hidden">
+                                <Building size={48} className="text-[#1f6b7a]" />
+                            </div>
+                            {isEditing && (
+                                <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/50 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-2xl cursor-pointer">
+                                    <Camera size={24} className="text-white" />
+                                </div>
+                            )}
                         </div>
-                        <div className="flex-1 mb-2">
-                            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Acme Corp</h1>
-                            <p className="text-gray-400 text-sm md:text-base max-w-2xl">Building the next generation of cloud infrastructure for the modern web.</p>
+
+                        <div className="flex-1 mb-2 w-full">
+                            {isEditing ? (
+                                <div className="space-y-3">
+                                    <input
+                                        name="name"
+                                        value={companyData.name}
+                                        onChange={handleChange}
+                                        className="w-full bg-[#15171c]/80 border border-white/20 rounded-lg px-3 py-2 text-3xl md:text-4xl font-bold text-white tracking-tight outline-none focus:border-[#1f6b7a] transition-all"
+                                    />
+                                    <input
+                                        name="tagline"
+                                        value={companyData.tagline}
+                                        onChange={handleChange}
+                                        className="w-full bg-[#15171c]/80 border border-white/20 rounded-lg px-3 py-2 text-sm md:text-base text-gray-300 outline-none focus:border-[#1f6b7a] transition-all"
+                                    />
+                                </div>
+                            ) : (
+                                <>
+                                    <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">{companyData.name}</h1>
+                                    <p className="text-gray-400 text-sm md:text-base max-w-2xl">{companyData.tagline}</p>
+                                </>
+                            )}
                         </div>
-                        <div className="flex gap-3">
-                            <a href="#" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 transition-colors pointer-events-auto">
-                                <Monitor size={20} />
-                            </a>
-                            <a href="#" className="p-2 rounded-lg bg-[#0077b5]/10 hover:bg-[#0077b5]/20 text-[#0077b5] border border-[#0077b5]/20 transition-colors pointer-events-auto">
-                                <Linkedin size={20} />
-                            </a>
-                            <a href="#" className="p-2 rounded-lg bg-[#1da1f2]/10 hover:bg-[#1da1f2]/20 text-[#1da1f2] border border-[#1da1f2]/20 transition-colors pointer-events-auto">
-                                <Twitter size={20} />
-                            </a>
-                        </div>
+
+                        {!isEditing && (
+                            <div className="flex gap-3">
+                                <a href="#" className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/10 transition-colors pointer-events-auto">
+                                    <Monitor size={20} />
+                                </a>
+                                <a href="#" className="p-2 rounded-lg bg-[#0077b5]/10 hover:bg-[#0077b5]/20 text-[#0077b5] border border-[#0077b5]/20 transition-colors pointer-events-auto">
+                                    <Linkedin size={20} />
+                                </a>
+                                <a href="#" className="p-2 rounded-lg bg-[#1da1f2]/10 hover:bg-[#1da1f2]/20 text-[#1da1f2] border border-[#1da1f2]/20 transition-colors pointer-events-auto">
+                                    <Twitter size={20} />
+                                </a>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -102,28 +177,43 @@ const CompanyProfile = () => {
                                 <Users className="text-[#1f6b7a]" size={24} />
                                 About Us
                             </h2>
-                            <div className="space-y-4 text-gray-400 leading-relaxed text-sm md:text-base">
-                                <p>
-                                    At Acme Corp, we believe that the future of technology lies in seamless integration and user-centric design. Founded in 2018, we have grown from a small garage startup to a global team of over 200 passionate engineers, designers, and thinkers.
-                                </p>
-                                <p>
-                                    Our mission is to democratize access to powerful cloud computing resources. We are driven by a culture of innovation, collaboration, and continuous learning. We value transparency, inclusivity, and the courage to take risks.
-                                </p>
-                                <p>
-                                    Joining our team means working on challenging problems that impact millions of users worldwide. We foster an environment where your voice is heard, and your contributions truly matter.
-                                </p>
-                            </div>
+
+                            {isEditing ? (
+                                <textarea
+                                    name="about"
+                                    value={companyData.about}
+                                    onChange={handleChange}
+                                    rows={8}
+                                    className="w-full bg-[#15171c] border border-white/10 rounded-xl px-4 py-3 text-gray-300 text-sm md:text-base leading-relaxed outline-none focus:border-[#1f6b7a] transition-all resize-y"
+                                />
+                            ) : (
+                                <div className="space-y-4 text-gray-400 leading-relaxed text-sm md:text-base whitespace-pre-line">
+                                    {companyData.about}
+                                </div>
+                            )}
                         </div>
 
                         {/* Section 2: Our Tech Stack */}
                         <div>
-                            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                                <Code2 className="text-[#1f6b7a]" size={24} />
-                                Our Tech Stack
-                            </h2>
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                                    <Code2 className="text-[#1f6b7a]" size={24} />
+                                    Our Tech Stack
+                                </h2>
+                                {isEditing && (
+                                    <button className="text-xs font-bold text-[#1f6b7a] hover:text-white flex items-center gap-1 border border-[#1f6b7a]/30 rounded-lg px-3 py-1.5 hover:bg-[#1f6b7a] transition-all">
+                                        <Plus size={14} /> Add Tech
+                                    </button>
+                                )}
+                            </div>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
                                 {techStack.map((tech, idx) => (
-                                    <div key={idx} className="bg-[#21242c] border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center gap-3 hover:bg-[#1f6b7a]/5 hover:border-[#1f6b7a]/30 hover:-translate-y-1 transition-all duration-300 cursor-default group">
+                                    <div key={idx} className="bg-[#21242c] border border-white/5 rounded-xl p-4 flex flex-col items-center justify-center gap-3 hover:bg-[#1f6b7a]/5 hover:border-[#1f6b7a]/30 hover:-translate-y-1 transition-all duration-300 cursor-default group relative">
+                                        {isEditing && (
+                                            <button className="absolute top-1 right-1 text-gray-600 hover:text-red-500 p-1">
+                                                <XCircle size={14} />
+                                            </button>
+                                        )}
                                         <div className="text-gray-400 group-hover:text-[#1f6b7a] transition-colors bg-[#1a1d23] p-3 rounded-lg border border-white/5">
                                             {tech.icon}
                                         </div>
@@ -140,9 +230,11 @@ const CompanyProfile = () => {
                                     <Briefcase className="text-[#1f6b7a]" size={24} />
                                     Open Roles
                                 </h2>
-                                <button className="text-sm font-bold text-[#1f6b7a] hover:text-white transition-colors flex items-center gap-1">
-                                    View All Jobs <ArrowRight size={16} />
-                                </button>
+                                {!isEditing && (
+                                    <button className="text-sm font-bold text-[#1f6b7a] hover:text-white transition-colors flex items-center gap-1">
+                                        View All Jobs <ArrowRight size={16} />
+                                    </button>
+                                )}
                             </div>
 
                             <div className="space-y-4">
@@ -175,7 +267,7 @@ const CompanyProfile = () => {
                                                     ))}
                                                 </div>
                                                 <button className="bg-white/5 hover:bg-[#1f6b7a] hover:text-white text-gray-300 text-sm font-bold py-2.5 px-6 rounded-lg border border-white/10 hover:border-[#1f6b7a] transition-all whitespace-nowrap">
-                                                    View Role
+                                                    {isEditing ? 'Manage' : 'View Role'}
                                                 </button>
                                             </div>
                                         </div>
@@ -197,23 +289,63 @@ const CompanyProfile = () => {
                             </h3>
 
                             <div className="space-y-4">
+                                {/* Established */}
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-[#1a1d23] border border-white/5">
                                     <span className="text-sm text-gray-400 flex items-center gap-2"><Calendar size={14} /> Founded</span>
-                                    <span className="text-sm font-bold text-white">2018</span>
+                                    {isEditing ? (
+                                        <input
+                                            name="founded"
+                                            value={companyData.founded}
+                                            onChange={handleChange}
+                                            className="w-24 bg-[#15171c] border border-white/10 rounded px-2 py-1 text-sm font-bold text-white text-right outline-none focus:border-[#1f6b7a]"
+                                        />
+                                    ) : (
+                                        <span className="text-sm font-bold text-white">{companyData.founded}</span>
+                                    )}
                                 </div>
+                                {/* HQ */}
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-[#1a1d23] border border-white/5">
                                     <span className="text-sm text-gray-400 flex items-center gap-2"><MapPin size={14} /> HQ</span>
-                                    <span className="text-sm font-bold text-white">San Francisco, CA</span>
+                                    {isEditing ? (
+                                        <input
+                                            name="hq"
+                                            value={companyData.hq}
+                                            onChange={handleChange}
+                                            className="w-32 bg-[#15171c] border border-white/10 rounded px-2 py-1 text-sm font-bold text-white text-right outline-none focus:border-[#1f6b7a]"
+                                        />
+                                    ) : (
+                                        <span className="text-sm font-bold text-white">{companyData.hq}</span>
+                                    )}
                                 </div>
+                                {/* Employees */}
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-[#1a1d23] border border-white/5">
                                     <span className="text-sm text-gray-400 flex items-center gap-2"><Users size={14} /> Employees</span>
-                                    <span className="text-sm font-bold text-white">200-500</span>
+                                    {isEditing ? (
+                                        <input
+                                            name="employees"
+                                            value={companyData.employees}
+                                            onChange={handleChange}
+                                            className="w-24 bg-[#15171c] border border-white/10 rounded px-2 py-1 text-sm font-bold text-white text-right outline-none focus:border-[#1f6b7a]"
+                                        />
+                                    ) : (
+                                        <span className="text-sm font-bold text-white">{companyData.employees}</span>
+                                    )}
                                 </div>
+                                {/* Website */}
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-[#1a1d23] border border-white/5">
                                     <span className="text-sm text-gray-400 flex items-center gap-2"><Globe size={14} /> Website</span>
-                                    <a href="#" className="text-sm font-bold text-[#1f6b7a] hover:underline flex items-center gap-1">
-                                        acmecorp.com <ExternalLink size={10} />
-                                    </a>
+                                    {isEditing ? (
+                                        <input
+                                            name="website"
+                                            value={companyData.website}
+                                            onChange={handleChange}
+                                            className="w-32 bg-[#15171c] border border-white/10 rounded px-2 py-1 text-sm font-bold text-white text-right outline-none focus:border-[#1f6b7a]"
+                                        />
+                                    ) : (
+                                        <a href="#" className="text-sm font-bold text-[#1f6b7a] hover:underline flex items-center gap-1">
+                                            {companyData.website} <ExternalLink size={10} />
+                                        </a>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -224,14 +356,26 @@ const CompanyProfile = () => {
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-[#1f6b7a]/10 blur-[50px] pointer-events-none rounded-full"></div>
 
                             <div className="relative z-10">
-                                <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2">
-                                    <Heart size={18} className="text-[#1f6b7a]" />
-                                    Perks & Benefits
-                                </h3>
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-base font-bold text-white flex items-center gap-2">
+                                        <Heart size={18} className="text-[#1f6b7a]" />
+                                        Perks & Benefits
+                                    </h3>
+                                    {isEditing && (
+                                        <button className="text-xs font-bold text-[#1f6b7a] hover:text-white flex items-center gap-1 border border-[#1f6b7a]/30 rounded-lg px-2 py-1 hover:bg-[#1f6b7a] transition-all">
+                                            <Plus size={12} /> Add
+                                        </button>
+                                    )}
+                                </div>
 
                                 <div className="grid grid-cols-1 gap-3">
                                     {perks.map((perk, idx) => (
-                                        <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-[#1a1d23]/80 border border-white/5 hover:border-[#1f6b7a]/30 transition-colors group">
+                                        <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-[#1a1d23]/80 border border-white/5 hover:border-[#1f6b7a]/30 transition-colors group relative">
+                                            {isEditing && (
+                                                <button className="absolute top-2 right-2 text-gray-600 hover:text-red-500 hidden group-hover:block">
+                                                    <XCircle size={14} />
+                                                </button>
+                                            )}
                                             <div className="w-8 h-8 rounded-lg bg-[#1f6b7a]/10 flex items-center justify-center text-[#1f6b7a] group-hover:bg-[#1f6b7a] group-hover:text-white transition-all duration-300">
                                                 {perk.icon}
                                             </div>
@@ -246,15 +390,6 @@ const CompanyProfile = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Contact/CTA Widget */}
-                        <div className="bg-gradient-to-br from-[#1f6b7a]/20 to-[#21242c] rounded-2xl border border-[#1f6b7a]/20 p-6 text-center">
-                            <h3 className="text-lg font-bold text-white mb-2">Interested in us?</h3>
-                            <p className="text-xs text-gray-400 mb-4">Follow us to get notified when new roles open up.</p>
-                            <button className="w-full py-3 bg-[#1f6b7a] hover:bg-[#2a8a9c] text-white font-bold rounded-xl shadow-lg shadow-[#1f6b7a]/25 transition-all transform hover:scale-[1.02] active:scale-[0.98]">
-                                Follow Company
-                            </button>
                         </div>
 
                     </div>

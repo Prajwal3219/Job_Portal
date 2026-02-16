@@ -18,6 +18,7 @@ import CandidateApplications from './components/dashboards/candidate/CandidateAp
 import CandidateProfileBuilder from './components/dashboards/candidate/CandidateProfileBuilder';
 import CandidateSettings from './components/dashboards/candidate/CandidateSettings';
 import RecruiterLayout from './components/dashboards/recruiter/RecruiterLayout'; // New Layout
+import CompanyProfile from './components/dashboards/recruiter/CompanyProfile'; // New Page
 import RecruiterDashboard from './components/dashboards/recruiter/RecruiterDashboard';
 import RecruiterApplications from './components/dashboards/recruiter/RecruiterApplications'; // New Page
 import RecruiterJobs from './components/dashboards/recruiter/RecruiterJobs'; // New Page
@@ -83,6 +84,11 @@ function App() {
               <Route path="settings" element={
                 <PageTransition>
                   <CandidateSettings />
+                </PageTransition>
+              } />
+              <Route path="company-profile" element={
+                <PageTransition>
+                  <CompanyProfile />
                 </PageTransition>
               } />
             </Route>

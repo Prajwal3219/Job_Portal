@@ -1,38 +1,37 @@
-import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import PageTransition from './components/common/PageTransition';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import PageTitle from './components/common/PageTitle';
+import PageTransition from './components/common/PageTransition';
 
 // Public pages
-import Landing from './components/landing/Landing';
 import AuthPage from './components/Authentication/AuthPage';
+import Landing from './components/landing/Landing';
 
 // Dashboards (standalone full-screen pages)
-import CandidateLayout from './components/dashboards/candidate/CandidateLayout'; // New Layout
-import CandidateDashboard from './components/dashboards/candidate/CandidateDashboard';
-import CandidateJobSearch from './components/dashboards/candidate/CandidateJobSearch'; // New Page
-import CandidateFreshers from './components/dashboards/candidate/CandidateFreshers'; // New Page
-import CandidateMessages from './components/dashboards/candidate/CandidateMessages'; // New Page
+import AdminDashboard from './components/dashboards/admin/AdminDashboard';
+import AdminModeration from './components/dashboards/admin/AdminModeration';
+import AdminOverview from './components/dashboards/admin/AdminOverview';
+import AdminReports from './components/dashboards/admin/AdminReports';
+import AdminSettings from './components/dashboards/admin/AdminSettings';
+import AdminSupport from './components/dashboards/admin/AdminSupport';
+import UsersPage from './components/dashboards/admin/UsersPage';
 import CandidateApplications from './components/dashboards/candidate/CandidateApplications'; // New Page
+import CandidateDashboard from './components/dashboards/candidate/CandidateDashboard';
+import CandidateFreshers from './components/dashboards/candidate/CandidateFreshers'; // New Page
+import CandidateJobSearch from './components/dashboards/candidate/CandidateJobSearch'; // New Page
+import CandidateLayout from './components/dashboards/candidate/CandidateLayout'; // New Layout
+import CandidateMessages from './components/dashboards/candidate/CandidateMessages'; // New Page
 import CandidateProfileBuilder from './components/dashboards/candidate/CandidateProfileBuilder';
 import CandidateSettings from './components/dashboards/candidate/CandidateSettings';
-import RecruiterLayout from './components/dashboards/recruiter/RecruiterLayout'; // New Layout
 import CompanyProfile from './components/dashboards/recruiter/CompanyProfile'; // New Page
-import RecruiterInterviews from './components/dashboards/recruiter/RecruiterInterviews'; // New Page
-import RecruiterDashboard from './components/dashboards/recruiter/RecruiterDashboard';
-import RecruiterApplications from './components/dashboards/recruiter/RecruiterApplications'; // New Page
-import RecruiterJobs from './components/dashboards/recruiter/RecruiterJobs'; // New Page
-import RecruiterSettings from './components/dashboards/recruiter/RecruiterSettings'; // New Page
-import RecruiterMessages from './components/dashboards/recruiter/RecruiterMessages'; // New Page
 import PostJob from './components/dashboards/recruiter/PostJob';
-import AdminDashboard from './components/dashboards/admin/AdminDashboard';
-import AdminSettings from './components/dashboards/admin/AdminSettings';
-import AdminModeration from './components/dashboards/admin/AdminModeration';
-import AdminSupport from './components/dashboards/admin/AdminSupport';
-import AdminOverview from './components/dashboards/admin/AdminOverview';
-import UsersPage from './components/dashboards/admin/UsersPage';
-import AdminReports from './components/dashboards/admin/AdminReports';
+import RecruiterApplications from './components/dashboards/recruiter/RecruiterApplications'; // New Page
+import RecruiterDashboard from './components/dashboards/recruiter/RecruiterDashboard';
+import RecruiterInterviews from './components/dashboards/recruiter/RecruiterInterviews'; // New Page
+import RecruiterJobs from './components/dashboards/recruiter/RecruiterJobs'; // New Page
+import RecruiterLayout from './components/dashboards/recruiter/RecruiterLayout'; // New Layout
+import RecruiterMessages from './components/dashboards/recruiter/RecruiterMessages'; // New Page
+import RecruiterSettings from './components/dashboards/recruiter/RecruiterSettings'; // New Page
 
 function App() {
   const location = useLocation();

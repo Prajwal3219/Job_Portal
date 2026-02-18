@@ -1,9 +1,11 @@
-import React from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 import { JobCard, StatCard } from './CandidateComponents';
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const { setSidebarOpen } = useOutletContext();
+  const firstName = user?.name ? user.name.split(' ')[0] : 'User';
 
   return (
     <>
@@ -26,7 +28,7 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="w-1/3 flex flex-col items-center justify-center text-center min-w-0">
-          <h1 className="text-lg font-bold text-white tracking-tight truncate">Welcome back, John</h1>
+          <h1 className="text-lg font-bold text-white tracking-tight truncate">Welcome back, {firstName}</h1>
           <p className="text-[11px] text-gray-400 hidden sm:block truncate">Here's what's happening today</p>
         </div>
         {/* Removed notification icon */}

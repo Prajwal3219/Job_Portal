@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  User,
-  Code,
-  Folder,
+  Award,
   BarChart2,
-  Settings,
+  BookOpen,
+  CheckCircle2,
+  Code,
+  ExternalLink,
+  Eye,
+  Folder,
   Github,
   Globe,
   Linkedin,
-  GraduationCap,
-  Save,
-  CheckCircle2,
-  Plus,
-  Menu,
-  X,
-  BookOpen,   // Added for Education
-  Award,      // Added for Certifications
-  Layers,     // Added for Projects
-  ExternalLink, // Added for Links
   LogOut,
+  Menu,
+  Plus,
+  Save,
+  Settings,
+  User,
+  X
 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 
 const StudentProfileBuilder = () => {
   const navigate = useNavigate();
-  // Theme configuration matches your Landing Page
+  const fileInputRef = useRef(null);
   const theme = {
     bg: "bg-[#15171c]",
     cardBg: "bg-[#1a1d23]",
@@ -35,10 +35,253 @@ const StudentProfileBuilder = () => {
     textSecondary: "text-gray-400",
     border: "border-gray-800",
   };
-
+  const { user } = useAuth();
   const [isOpenToWork, setIsOpenToWork] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('profile');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [showCertPreview, setShowCertPreview] = useState(false);
+
+  // Profile State
+  const [profileData, setProfileData] = useState({
+    profileInfo: {
+      bio: '',
+      badges: [],
+      isOpenToWork: true,
+      avatar: '',
+      profileImage: '',
+      title: ''
+    },
+    education: [],
+    skills: [],
+    certifications: [],
+    projects: [],
+    links: {
+      github: '',
+      portfolio: '',
+      linkedin: ''
+    },
+    experience: []
+  });
+
+  // UI state for adding items
+  const [showAddForm, setShowAddForm] = useState({
+    education: false,
+    skill: false,
+    project: false,
+    cert: false,
+    experience: false
+  });
+
+  const [newItem, setNewItem] = useState({
+    education: { school: '', degree: '', year: '', grade: '' },
+    skill: '',
+    project: { title: '', desc: '', stack: [], githubLink: '', liveLink: '' },
+    cert: { title: '', date: '', image: '', imageName: '' },
+    experience: { role: '', company: '', date: '', desc: '', active: false }
+  });
+
+  const handleAddItem = (type) => {
+    if (type === 'education') {
+      updateNestedState('education', null, [...profileData.education, newItem.education]);
+      setNewItem(prev => ({ ...prev, education: { school: '', degree: '', year: '', grade: '' } }));
+    } else if (type === 'skills' || type === 'skill') {
+      if (newItem.skill.trim()) {
+        updateNestedState('skills', null, [...profileData.skills, newItem.skill.trim()]);
+        setNewItem(prev => ({ ...prev, skill: '' }));
+      }
+    } else if (type === 'projects') {
+      updateNestedState('projects', null, [...profileData.projects, newItem.project]);
+      setNewItem(prev => ({ ...prev, project: { title: '', desc: '', stack: [], githubLink: '', liveLink: '' } }));
+    } else if (type === 'certifications' || type === 'cert') {
+      updateNestedState('certifications', null, [...profileData.certifications, newItem.cert]);
+      setNewItem(prev => ({ ...prev, cert: { title: '', date: '', image: '', imageName: '' } }));
+      setShowCertPreview(false);
+    } else if (type === 'experience') {
+      updateNestedState('experience', null, [...profileData.experience, newItem.experience]);
+      setNewItem(prev => ({ ...prev, experience: { role: '', company: '', date: '', desc: '', active: false } }));
+    }
+    setShowAddForm(prev => ({ ...prev, education: false, skill: false, project: false, cert: false, experience: false }));
+  };
+
+  const handleRemoveItem = (type, index) => {
+    const list = [...profileData[type]];
+    list.splice(index, 1);
+    updateNestedState(type, null, list);
+  };
+
+  const completionScore = useMemo(() => {
+    let score = 0;
+
+    // Profile Image: 10%
+    if (profileData.profileInfo?.profileImage) score += 10;
+
+    // Bio: 10%
+    if (profileData.profileInfo?.bio && profileData.profileInfo.bio.trim().length > 10) score += 10;
+
+    // Title: 5%
+    if (profileData.profileInfo?.title && profileData.profileInfo.title.trim() !== '') score += 5;
+
+    // Education: 15% (at least 1 entry)
+    if (profileData.education?.length > 0) score += 15;
+
+    // Skills: 15% (5% per skill, max 15%)
+    const skillScore = Math.min((profileData.skills?.length || 0) * 5, 15);
+    score += skillScore;
+
+    // Certifications: 15% (at least 1 entry)
+    if (profileData.certifications?.length > 0) score += 15;
+
+    // Projects: 20% (at least 1 entry)
+    if (profileData.projects?.length > 0) score += 20;
+
+    // Experience: 10% (at least 1 entry)
+    if (profileData.experience?.length > 0) score += 10;
+
+    return score;
+  }, [profileData]);
+
+  // Fetch profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/candidate/me', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setProfileData(prev => ({
+            ...prev,
+            ...data,
+            profileInfo: data.profileInfo || prev.profileInfo,
+            education: data.education || prev.education,
+            skills: data.skills || prev.skills,
+            certifications: data.certifications || prev.certifications,
+            projects: data.projects || prev.projects,
+            links: data.links || prev.links,
+            experience: data.experience || prev.experience
+          }));
+          setIsOpenToWork(data.profileInfo?.isOpenToWork ?? true);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    setMessage('');
+    try {
+      const response = await fetch('http://localhost:5000/api/candidate/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          ...profileData,
+          profileInfo: {
+            ...profileData.profileInfo,
+            isOpenToWork
+          }
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setMessage('Profile updated successfully!');
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        setMessage('Error: ' + (data.message || 'Failed to update profile'));
+      }
+    } catch (error) {
+      setMessage('Error: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('profileImage', file);
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/candidate/upload-profile-image', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        // Backend returns the path, we need to make sure we store it
+        updateNestedState('profileInfo', 'profileImage', data.profileImage);
+        setMessage('Profile image updated!');
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        setMessage('Error: ' + (data.message || 'Upload failed'));
+      }
+    } catch (error) {
+      setMessage('Error: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCertImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('certificateImage', file);
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/candidate/upload-certificate-image', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setNewItem(prev => ({
+          ...prev,
+          cert: { ...prev.cert, image: data.image, imageName: file.name }
+        }));
+        setMessage('Certificate image uploaded!');
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        setMessage('Error: ' + (data.message || 'Upload failed'));
+      }
+    } catch (error) {
+      setMessage('Error: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Helper to update nested state
+  const updateNestedState = (section, field, value) => {
+    setProfileData(prev => ({
+      ...prev,
+      [section]: field ? { ...prev[section], [field]: value } : value
+    }));
+  };
 
   // --- SCROLL FUNCTION ---
   const scrollToSection = (id) => {
@@ -71,7 +314,7 @@ const StudentProfileBuilder = () => {
   );
 
   // --- SECTION TITLE HELPER ---
-  const SectionTitle = ({ title, subtitle, action }) => (
+  const SectionTitle = ({ title, subtitle, action, onAction }) => (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
       <div>
         <h3 className="text-lg font-bold flex items-center gap-2">
@@ -81,7 +324,10 @@ const StudentProfileBuilder = () => {
         {subtitle && <p className="text-sm text-gray-500 ml-3">{subtitle}</p>}
       </div>
       {action && (
-        <button className="text-xs font-bold text-[#1f6b7a] border border-[#1f6b7a]/30 px-4 py-2 rounded-lg hover:bg-[#1f6b7a]/10 transition-colors w-full sm:w-auto flex items-center justify-center gap-2">
+        <button
+          onClick={onAction}
+          className="text-xs font-bold text-[#1f6b7a] border border-[#1f6b7a]/30 px-4 py-2 rounded-lg hover:bg-[#1f6b7a]/10 transition-colors w-full sm:w-auto flex items-center justify-center gap-2"
+        >
           {action}
         </button>
       )}
@@ -143,9 +389,19 @@ const StudentProfileBuilder = () => {
 
         {/* User Mini Profile */}
         <div className={`mt-auto p-4 rounded-xl ${theme.cardBg} border ${theme.border} flex items-center gap-3`}>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-gray-700 to-gray-600 border border-gray-500"></div>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#1f6b7a] to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-lg uppercase overflow-hidden">
+            {profileData.profileInfo.profileImage ? (
+              <img
+                src={`http://localhost:5000${profileData.profileInfo.profileImage}`}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              user?.name ? user.name.split(' ').map(n => n[0]).join('') : '??'
+            )}
+          </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">Alex Chen</p>
+            <p className="text-sm font-medium truncate">{user?.name || 'Candidate'}</p>
             <p className="text-xs text-teal-400 truncate">Premium Member</p>
           </div>
           <button
@@ -179,10 +435,13 @@ const StudentProfileBuilder = () => {
             <div className={`w-full md:w-auto px-5 py-3 rounded-2xl ${theme.cardBg} border ${theme.border} flex items-center justify-between md:justify-start gap-4`}>
               <div className="text-right">
                 <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">Completion Score</p>
-                <p className="text-xl font-bold">85%</p>
+                <p className="text-xl font-bold">{completionScore}%</p>
               </div>
               <div className="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
-                <div className="h-full w-[85%] bg-gradient-to-r from-teal-400 to-[#1f6b7a]"></div>
+                <div
+                  className="h-full bg-gradient-to-r from-teal-400 to-[#1f6b7a] transition-all duration-500 ease-out"
+                  style={{ width: `${completionScore}%` }}
+                ></div>
               </div>
             </div>
           </div>
@@ -195,11 +454,32 @@ const StudentProfileBuilder = () => {
             <div className="flex flex-col md:flex-row gap-8">
               {/* Avatar Upload */}
               <div className="flex flex-col gap-3 mx-auto md:mx-0">
-                <div className="w-32 h-32 rounded-2xl bg-gradient-to-b from-gray-700 to-gray-800 border-2 border-gray-600 flex items-center justify-center relative overflow-hidden group-hover:border-[#1f6b7a] transition-colors">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  accept="image/*"
+                />
+                <div
+                  className="w-32 h-32 rounded-2xl bg-gradient-to-b from-gray-700 to-gray-800 border-2 border-gray-600 flex items-center justify-center relative overflow-hidden group-hover:border-[#1f6b7a] transition-colors cursor-pointer"
+                  onClick={() => fileInputRef.current.click()}
+                >
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-all"></div>
-                  <User size={40} className="text-gray-500 group-hover:text-white transition-colors relative z-10" />
+                  {profileData.profileInfo.profileImage ? (
+                    <img
+                      src={`http://localhost:5000${profileData.profileInfo.profileImage}`}
+                      alt="Profile"
+                      className="w-full h-full object-cover relative z-10"
+                    />
+                  ) : (
+                    <User size={40} className="text-gray-500 group-hover:text-white transition-colors relative z-10" />
+                  )}
                 </div>
-                <button className="text-xs font-medium bg-black/40 hover:bg-black/60 py-1.5 rounded-lg border border-gray-700 transition-all text-white">
+                <button
+                  onClick={() => fileInputRef.current.click()}
+                  className="text-xs font-medium bg-black/40 hover:bg-black/60 py-1.5 rounded-lg border border-gray-700 transition-all text-white"
+                >
                   CHANGE
                 </button>
               </div>
@@ -208,7 +488,7 @@ const StudentProfileBuilder = () => {
               <div className="flex-1 space-y-6">
                 <div className="flex flex-col md:flex-row justify-between items-start gap-2">
                   <div className="text-center md:text-left w-full md:w-auto">
-                    <h2 className="text-2xl font-bold mb-2">Alex Chen</h2>
+                    <h2 className="text-2xl font-bold mb-2">{user?.name || 'Candidate'}</h2>
                     <div className="flex flex-wrap justify-center md:justify-start gap-2">
                       <Badge text="Full Stack Engineer" />
                       <Badge text="UI/UX Designer" />
@@ -239,75 +519,358 @@ const StudentProfileBuilder = () => {
                   <textarea
                     className={`w-full h-24 rounded-xl bg-[#15171c] border ${theme.border} p-4 text-sm text-gray-300 focus:outline-none focus:border-[#1f6b7a] transition-colors resize-none`}
                     placeholder="Tell your professional story..."
+                    value={profileData.profileInfo.bio}
+                    onChange={(e) => updateNestedState('profileInfo', 'bio', e.target.value)}
                   ></textarea>
+                  {message && (
+                    <div className={`mt-2 p-3 rounded-lg text-xs font-bold ${message.includes('Error') ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-green-500/10 text-green-500 border border-green-500/20'}`}>
+                      {message}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* SECTION 2: EDUCATION (New) */}
+          {/* SECTION 2: EDUCATION */}
           <section id="education" className={`p-6 md:p-8 rounded-3xl ${theme.cardBg} border ${theme.border}`}>
-            <SectionTitle title="Education" subtitle="Your academic journey" action={<><Plus size={14} /> Add Education</>} />
+            <SectionTitle
+              title="Education"
+              subtitle="Your academic journey"
+              action={<><Plus size={14} /> Add Education</>}
+              onAction={() => setShowAddForm(prev => ({ ...prev, education: !prev.education }))}
+            />
+
+            {showAddForm.education && (
+              <div className="mb-6 p-4 rounded-xl bg-[#15171c] border border-[#1f6b7a]/30 space-y-4 animate-in fade-in slide-in-from-top-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="School/University"
+                    className={`bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                    value={newItem.education.school}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, education: { ...prev.education, school: e.target.value } }))}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Degree"
+                    className={`bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                    value={newItem.education.degree}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, education: { ...prev.education, degree: e.target.value } }))}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Year (e.g. 2021 - 2025)"
+                    className={`bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                    value={newItem.education.year}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, education: { ...prev.education, year: e.target.value } }))}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Grade/CGPA"
+                    className={`bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                    value={newItem.education.grade}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, education: { ...prev.education, grade: e.target.value } }))}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleAddItem('education')}
+                    className="px-4 py-2 bg-[#1f6b7a] text-white rounded-lg text-xs font-bold hover:bg-[#185662] transition-colors"
+                  >
+                    Add Entry
+                  </button>
+                  <button
+                    onClick={() => setShowAddForm(prev => ({ ...prev, education: false }))}
+                    className="px-4 py-2 border border-gray-700 text-gray-400 rounded-lg text-xs font-bold hover:bg-gray-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4">
-              <EducationCard
-                school="University of Technology"
-                degree="B.Tech in Computer Science"
-                year="2021 - 2025"
-                grade="CGPA: 9.2"
-                logo="UT"
-              />
-              <EducationCard
-                school="City High School"
-                degree="Secondary Education (Science)"
-                year="2019 - 2021"
-                grade="Percentage: 95%"
-                logo="CH"
-              />
+              {profileData.education.length > 0 ? (
+                profileData.education.map((edu, index) => (
+                  <div key={index} className="relative group">
+                    <EducationCard
+                      school={edu.school}
+                      degree={edu.degree}
+                      year={edu.year}
+                      grade={edu.grade}
+                      logo={edu.logo || (edu.school ? edu.school.substring(0, 2).toUpperCase() : '??')}
+                    />
+                    <button
+                      onClick={() => handleRemoveItem('education', index)}
+                      className="absolute top-4 right-4 p-1.5 rounded-lg bg-red-500/10 text-red-500 border border-red-500/20 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm italic">No education history added yet.</p>
+              )}
             </div>
           </section>
 
-          {/* SECTION 3: SKILL MATRIX (Existing) */}
+          {/* SECTION 3: SKILL MATRIX */}
           <div id="skills" className={`p-6 md:p-8 rounded-3xl ${theme.cardBg} border ${theme.border}`}>
-            <SectionTitle title="Skill Matrix" subtitle="Categorize your primary competencies" action="UPDATE SKILLS" />
+            <SectionTitle
+              title="Skill Matrix"
+              subtitle="Categorize your primary competencies"
+              action={showAddForm.skill ? "CANCEL" : <><Plus size={14} /> Add Skill</>}
+              onAction={() => setShowAddForm(prev => ({ ...prev, skill: !prev.skill }))}
+            />
+
+            {showAddForm.skill && (
+              <div className="mb-6 flex gap-2 animate-in fade-in slide-in-from-top-2">
+                <input
+                  type="text"
+                  placeholder="Enter skill name..."
+                  className={`flex-1 bg-[#15171c] border ${theme.border} rounded-xl px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                  value={newItem.skill}
+                  onChange={(e) => setNewItem(prev => ({ ...prev, skill: e.target.value }))}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddItem('skill')}
+                  autoFocus
+                />
+                <button
+                  onClick={() => handleAddItem('skill')}
+                  className="px-4 py-2 bg-[#1f6b7a] text-white rounded-xl text-xs font-bold hover:bg-[#185662] transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+            )}
 
             <div className="flex flex-wrap gap-3">
-              {['React.js', 'TypeScript', 'Node.js', 'GraphQL', 'AWS Cloud', 'Tailwind CSS', 'Docker', 'Python'].map((skill) => (
-                <span key={skill} className="px-4 py-2 rounded-xl bg-[#15171c] border border-gray-800 text-sm text-gray-300 hover:border-[#1f6b7a] hover:text-[#1f6b7a] cursor-pointer transition-all">
-                  {skill}
-                </span>
-              ))}
-              <span className="px-4 py-2 rounded-xl border border-dashed border-gray-700 text-sm text-gray-500 hover:border-gray-500 hover:text-gray-300 cursor-pointer transition-all flex items-center gap-2">
+              {profileData.skills.length > 0 ? (
+                profileData.skills.map((skill, index) => (
+                  <div key={index} className="group relative">
+                    <span className="px-4 py-2 rounded-xl bg-[#15171c] border border-gray-800 text-sm text-gray-300 hover:border-[#1f6b7a] hover:text-[#1f6b7a] cursor-pointer transition-all flex items-center gap-2">
+                      {skill}
+                    </span>
+                    <button
+                      onClick={() => handleRemoveItem('skills', index)}
+                      className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[10px]"
+                    >
+                      <X size={10} />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm italic">No skills added yet.</p>
+              )}
+              <span
+                onClick={() => setShowAddForm(prev => ({ ...prev, skill: true }))}
+                className="px-4 py-2 rounded-xl border border-dashed border-gray-700 text-sm text-gray-500 hover:border-gray-500 hover:text-gray-300 cursor-pointer transition-all flex items-center gap-2"
+              >
                 <Plus size={14} /> Add More
               </span>
             </div>
           </div>
 
-          {/* SECTION 4: CERTIFICATIONS (New) */}
+          {/* SECTION 4: CERTIFICATIONS */}
           <section id="certifications" className={`p-6 md:p-8 rounded-3xl ${theme.cardBg} border ${theme.border}`}>
-            <SectionTitle title="Certifications" subtitle="Validated skills and achievements" action={<><Plus size={14} /> Add Certificate</>} />
+            <SectionTitle
+              title="Certifications"
+              subtitle="Validated skills and achievements"
+              action={showAddForm.cert ? "CANCEL" : <><Plus size={14} /> Add Certificate</>}
+              onAction={() => setShowAddForm(prev => ({ ...prev, cert: !prev.cert }))}
+            />
+
+            {showAddForm.cert && (
+              <div className="mb-6 p-4 rounded-xl bg-[#15171c] border border-[#1f6b7a]/30 space-y-4 animate-in fade-in slide-in-from-top-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Certificate Title"
+                    className={`bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                    value={newItem.cert.title}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, cert: { ...prev.cert, title: e.target.value } }))}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Date / Year"
+                    className={`bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                    value={newItem.cert.date}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, cert: { ...prev.cert, date: e.target.value } }))}
+                  />
+                  <div className="flex flex-col gap-2">
+                    <input
+                      type="file"
+                      id="cert-image"
+                      className="hidden"
+                      onChange={handleCertImageUpload}
+                      accept="image/*"
+                    />
+                    <label
+                      htmlFor="cert-image"
+                      className={`cursor-pointer bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm text-gray-400 hover:border-[#1f6b7a] transition-colors flex items-center justify-between gap-2 overflow-hidden`}
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <Plus size={14} />
+                        <span className="truncate">
+                          {newItem.cert.imageName || 'Upload Certificate Image'}
+                        </span>
+                      </div>
+                      {newItem.cert.image && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowCertPreview(!showCertPreview);
+                          }}
+                          className={`p-1 rounded-md hover:bg-gray-700 transition-colors ${showCertPreview ? 'text-[#1f6b7a]' : 'text-gray-500'}`}
+                        >
+                          <Eye size={16} />
+                        </button>
+                      )}
+                    </label>
+                  </div>
+                </div>
+
+                {newItem.cert.image && showCertPreview && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="overflow-hidden rounded-xl border border-gray-800"
+                  >
+                    <img
+                      src={`http://localhost:5000${newItem.cert.image}`}
+                      alt="Preview"
+                      className="w-full h-48 object-contain bg-black/40"
+                    />
+                  </motion.div>
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleAddItem('cert')}
+                    className="px-4 py-2 bg-[#1f6b7a] text-white rounded-lg text-xs font-bold hover:bg-[#185662] transition-colors"
+                  >
+                    Add Certificate
+                  </button>
+                  <button
+                    onClick={() => setShowAddForm(prev => ({ ...prev, cert: false }))}
+                    className="px-4 py-2 border border-gray-700 text-gray-400 rounded-lg text-xs font-bold hover:bg-gray-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <CertCard title="AWS Certified Cloud Practitioner" issuer="Amazon Web Services" date="Issued Dec 2024" />
-              <CertCard title="Meta Front-End Developer" issuer="Coursera" date="Issued Aug 2024" />
+              {profileData.certifications.length > 0 ? (
+                profileData.certifications.map((cert, index) => (
+                  <div key={index} className="relative group">
+                    <CertCard
+                      title={cert.title}
+                      date={cert.date}
+                      image={cert.image}
+                    />
+                    <button
+                      onClick={() => handleRemoveItem('certifications', index)}
+                      className="absolute top-4 right-4 p-2.5 rounded-xl bg-red-500/20 text-red-500 border border-red-500/30 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shadow-lg z-20"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm italic col-span-2">No certifications added yet.</p>
+              )}
             </div>
           </section>
 
-          {/* SECTION 5: PROJECTS (New) */}
+          {/* SECTION 5: PROJECTS */}
           <section id="projects" className={`p-6 md:p-8 rounded-3xl ${theme.cardBg} border ${theme.border}`}>
-            <SectionTitle title="Projects" subtitle="Showcase your best work" action={<><Plus size={14} /> Add Project</>} />
+            <SectionTitle
+              title="Projects"
+              subtitle="Showcase your best work"
+              action={<><Plus size={14} /> Add Project</>}
+              onAction={() => setShowAddForm(prev => ({ ...prev, project: !prev.project }))}
+            />
+
+            {showAddForm.project && (
+              <div className="mb-6 p-4 rounded-xl bg-[#15171c] border border-[#1f6b7a]/30 space-y-4 animate-in fade-in slide-in-from-top-2">
+                <input
+                  type="text"
+                  placeholder="Project Title"
+                  className={`w-full bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                  value={newItem.project.title}
+                  onChange={(e) => setNewItem(prev => ({ ...prev, project: { ...prev.project, title: e.target.value } }))}
+                />
+                <textarea
+                  placeholder="Project Description"
+                  className={`w-full h-24 bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none resize-none`}
+                  value={newItem.project.desc}
+                  onChange={(e) => setNewItem(prev => ({ ...prev, project: { ...prev.project, desc: e.target.value } }))}
+                ></textarea>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="GitHub Repo Link"
+                    className={`bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                    value={newItem.project.githubLink}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, project: { ...prev.project, githubLink: e.target.value } }))}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Deployment / Live Link"
+                    className={`bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                    value={newItem.project.liveLink}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, project: { ...prev.project, liveLink: e.target.value } }))}
+                  />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Tech Stack (comma separated)"
+                  className={`w-full bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                  onChange={(e) => setNewItem(prev => ({ ...prev, project: { ...prev.project, stack: e.target.value.split(',').map(s => s.trim()).filter(Boolean) } }))}
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleAddItem('projects')}
+                    className="px-4 py-2 bg-[#1f6b7a] text-white rounded-lg text-xs font-bold hover:bg-[#185662] transition-colors"
+                  >
+                    Add Project
+                  </button>
+                  <button
+                    onClick={() => setShowAddForm(prev => ({ ...prev, project: false }))}
+                    className="px-4 py-2 border border-gray-700 text-gray-400 rounded-lg text-xs font-bold hover:bg-gray-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="space-y-4">
-              <ProjectCard
-                title="E-Commerce Dashboard"
-                desc="A comprehensive React dashboard for managing inventory, orders, and analytics with dark mode support."
-                stack={["React", "Tailwind", "Recharts"]}
-              />
-              <ProjectCard
-                title="AI Content Generator"
-                desc="SaaS application leveraging OpenAI API to help marketers generate blog posts and social media captions."
-                stack={["Next.js", "OpenAI API", "Stripe"]}
-              />
+              {profileData.projects.length > 0 ? (
+                profileData.projects.map((proj, index) => (
+                  <div key={index} className="relative group">
+                    <ProjectCard
+                      title={proj.title}
+                      desc={proj.desc}
+                      stack={proj.stack || []}
+                      github={proj.githubLink}
+                      live={proj.liveLink}
+                    />
+                    <button
+                      onClick={() => handleRemoveItem('projects', index)}
+                      className="absolute top-5 right-5 p-2.5 rounded-xl bg-red-500/20 text-red-500 border border-red-500/30 opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500 hover:text-white shadow-lg z-20"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm italic">No projects added yet.</p>
+              )}
             </div>
           </section>
 
@@ -319,37 +882,160 @@ const StudentProfileBuilder = () => {
           {/* Neural Links */}
           <div className={`p-6 rounded-3xl ${theme.cardBg} border ${theme.border}`}>
             <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-5">Neural Links</h3>
-            <div className="space-y-3">
-              <LinkItem icon={<Github size={18} />} title="GitHub" status="CONNECTED" active />
-              <LinkItem icon={<Globe size={18} />} title="Portfolio" status="NOT LINKED" />
-              <LinkItem icon={<Linkedin size={18} />} title="LinkedIn" status="NOT LINKED" />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <LinkItem
+                  icon={<Github size={18} />}
+                  title="GitHub"
+                  status={profileData.links.github ? "CONNECTED" : "NOT LINKED"}
+                  active={!!profileData.links.github}
+                />
+                <input
+                  type="text"
+                  placeholder="github.com/username"
+                  className={`w-full bg-[#15171c] border ${theme.border} rounded-lg px-3 py-1.5 text-xs text-gray-400 focus:border-[#1f6b7a] outline-none`}
+                  value={profileData.links.github}
+                  onChange={(e) => updateNestedState('links', 'github', e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <LinkItem
+                  icon={<Globe size={18} />}
+                  title="Portfolio"
+                  status={profileData.links.portfolio ? "CONNECTED" : "NOT LINKED"}
+                  active={!!profileData.links.portfolio}
+                />
+                <input
+                  type="text"
+                  placeholder="portfolio-site.com"
+                  className={`w-full bg-[#15171c] border ${theme.border} rounded-lg px-3 py-1.5 text-xs text-gray-400 focus:border-[#1f6b7a] outline-none`}
+                  value={profileData.links.portfolio}
+                  onChange={(e) => updateNestedState('links', 'portfolio', e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <LinkItem
+                  icon={<Linkedin size={18} />}
+                  title="LinkedIn"
+                  status={profileData.links.linkedin ? "CONNECTED" : "NOT LINKED"}
+                  active={!!profileData.links.linkedin}
+                />
+                <input
+                  type="text"
+                  placeholder="linkedin.com/in/username"
+                  className={`w-full bg-[#15171c] border ${theme.border} rounded-lg px-3 py-1.5 text-xs text-gray-400 focus:border-[#1f6b7a] outline-none`}
+                  value={profileData.links.linkedin}
+                  onChange={(e) => updateNestedState('links', 'linkedin', e.target.value)}
+                />
+              </div>
             </div>
           </div>
 
           {/* Data Stream (Timeline) */}
           <div className={`p-6 rounded-3xl ${theme.cardBg} border ${theme.border} relative`}>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-6">Data Stream</h3>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Data Stream</h3>
+              <button
+                onClick={() => setShowAddForm(prev => ({ ...prev, experience: !prev.experience }))}
+                className="p-1 hover:bg-gray-800 rounded-lg text-[#1f6b7a] transition-colors"
+                title="Add experience"
+              >
+                <Plus size={20} />
+              </button>
+            </div>
+
+            {showAddForm.experience && (
+              <div className="mb-6 p-4 rounded-xl bg-[#15171c] border border-[#1f6b7a]/30 space-y-4 animate-in fade-in slide-in-from-top-2">
+                <input
+                  type="text"
+                  placeholder="Role (e.g. Full Stack Intern)"
+                  className={`w-full bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                  value={newItem.experience.role}
+                  onChange={(e) => setNewItem(prev => ({ ...prev, experience: { ...prev.experience, role: e.target.value } }))}
+                />
+                <input
+                  type="text"
+                  placeholder="Company"
+                  className={`w-full bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                  value={newItem.experience.company}
+                  onChange={(e) => setNewItem(prev => ({ ...prev, experience: { ...prev.experience, company: e.target.value } }))}
+                />
+                <input
+                  type="text"
+                  placeholder="Date (e.g. 2023 - Pres.)"
+                  className={`w-full bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none`}
+                  value={newItem.experience.date}
+                  onChange={(e) => setNewItem(prev => ({ ...prev, experience: { ...prev.experience, date: e.target.value } }))}
+                />
+                <textarea
+                  placeholder="Brief description..."
+                  className={`w-full h-20 bg-[#1a1d23] border ${theme.border} rounded-lg px-4 py-2 text-sm focus:border-[#1f6b7a] outline-none resize-none`}
+                  value={newItem.experience.desc}
+                  onChange={(e) => setNewItem(prev => ({ ...prev, experience: { ...prev.experience, desc: e.target.value } }))}
+                ></textarea>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="active-job"
+                    checked={newItem.experience.active}
+                    onChange={(e) => setNewItem(prev => ({ ...prev, experience: { ...prev.experience, active: e.target.checked } }))}
+                    className="rounded border-gray-700 bg-gray-800 text-[#1f6b7a] focus:ring-[#1f6b7a]"
+                  />
+                  <label htmlFor="active-job" className="text-xs text-gray-400">Current Role</label>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleAddItem('experience')}
+                    className="flex-1 py-2 bg-[#1f6b7a] text-white rounded-lg text-xs font-bold hover:bg-[#185662] transition-colors"
+                  >
+                    Add
+                  </button>
+                  <button
+                    onClick={() => setShowAddForm(prev => ({ ...prev, experience: false }))}
+                    className="px-4 py-2 border border-gray-700 text-gray-400 rounded-lg text-xs font-bold hover:bg-gray-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="relative pl-4 border-l border-gray-800 space-y-8">
-              <TimelineItem
-                role="Full Stack Intern"
-                company="Starlight Systems"
-                date="2023 - Pres."
-                active
-              />
-              <TimelineItem
-                role="Computer Science"
-                company="University of Tech"
-                date="2021 - 2025"
-                icon={<GraduationCap size={16} />}
-              />
+              {profileData.experience.length > 0 ? (
+                profileData.experience.map((exp, index) => (
+                  <div key={index} className="relative group">
+                    <TimelineItem
+                      role={exp.role}
+                      company={exp.company}
+                      date={exp.date}
+                      desc={exp.desc}
+                      active={exp.active}
+                    />
+                    <button
+                      onClick={() => handleRemoveItem('experience', index)}
+                      className="absolute -top-1 -right-2 p-1 rounded-md bg-red-500/10 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Remove entry"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-xs italic">No entries in data stream.</p>
+              )}
             </div>
 
             {/* Save Button */}
             <div className="mt-8 sticky top-8">
-              <button className={`w-full py-2.5 rounded-xl ${theme.accent} ${theme.accentHover} text-white font-bold text-sm shadow-lg shadow-teal-900/20 flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02]`}>
+              <button
+                onClick={handleSave}
+                disabled={isLoading}
+                className={`w-full py-2.5 rounded-xl ${theme.accent} ${theme.accentHover} text-white font-bold text-sm shadow-lg shadow-teal-900/20 flex items-center justify-center gap-2 transition-all transform hover:scale-[1.02] disabled:opacity-50`}
+              >
                 <Save size={16} />
-                SAVE CONFIG
+                {isLoading ? 'SAVING...' : 'SAVE CONFIG'}
               </button>
             </div>
           </div>
@@ -398,19 +1084,19 @@ const LinkItem = ({ icon, title, status, active }) => (
   </div>
 );
 
-const TimelineItem = ({ role, company, date, active }) => (
+const TimelineItem = ({ role, company, date, active, desc }) => (
   <div className="relative group">
     {/* Timeline Dot */}
     <div className={`absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full border-2 ${active ? 'bg-[#1f6b7a] border-[#1f6b7a] shadow-[0_0_10px_rgba(31,107,122,0.5)]' : 'bg-[#15171c] border-gray-600'}`}></div>
 
-    <div className="mb-1 flex justify-between items-start">
-      <h4 className={`text-sm font-bold ${active ? 'text-white' : 'text-gray-300'}`}>{role}</h4>
-      <span className="text-[10px] font-mono text-gray-500">{date}</span>
+    <div className="mb-1 flex justify-between items-start gap-2">
+      <h4 className={`text-sm font-bold ${active ? 'text-white' : 'text-gray-300'} break-words flex-1`}>{role}</h4>
+      <span className="text-[10px] font-mono text-gray-500 whitespace-nowrap">{date}</span>
     </div>
     <p className="text-xs text-[#1f6b7a] font-medium mb-2">{company}</p>
-    {active && (
-      <p className="text-xs text-gray-500 leading-relaxed">
-        Developing core components for a high-traffic e-commerce platform.
+    {desc && (
+      <p className="text-xs text-gray-500 leading-relaxed break-words">
+        {desc}
       </p>
     )}
   </div>
@@ -427,44 +1113,126 @@ const EducationCard = ({ school, degree, year, grade, logo }) => (
         <h4 className="font-bold text-white text-sm md:text-base">{school}</h4>
         <span className="text-xs text-gray-500 font-mono whitespace-nowrap ml-2">{year}</span>
       </div>
-      <p className="text-sm text-[#1f6b7a]">{degree}</p>
-      <p className="text-xs text-gray-500 mt-1">{grade}</p>
+      <p className="text-sm text-gray-400 mt-1">
+        <span className="text-[#1f6b7a] font-bold">cgp :</span> {grade || 'N/A'}
+        <span className="text-[#1f6b7a] font-bold ml-3">degree :</span> {degree}
+      </p>
     </div>
   </div>
 );
 
-const CertCard = ({ title, issuer, date }) => (
-  <div className="p-4 rounded-xl bg-[#15171c] border border-gray-800 hover:border-[#1f6b7a]/50 transition-colors cursor-pointer group">
-    <div className="flex justify-between items-start mb-2">
-      <div className="p-2 rounded-lg bg-gray-800 text-[#1f6b7a] group-hover:bg-[#1f6b7a] group-hover:text-white transition-colors">
-        <Award size={18} />
+const CertCard = ({ title, date, image }) => (
+  <motion.div
+    whileHover={{ y: -5, transition: { duration: 0.2 } }}
+    className="p-5 rounded-3xl bg-[#1a1d23] border border-gray-800 hover:border-[#1f6b7a]/40 group transition-all relative overflow-hidden flex flex-col h-full shadow-lg hover:shadow-teal-900/20"
+  >
+    {/* Background Decorative Element */}
+    <div className="absolute top-0 right-0 w-32 h-32 bg-[#1f6b7a]/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none group-hover:bg-[#1f6b7a]/10 transition-colors"></div>
+
+    <div className="flex flex-col gap-4 relative z-10">
+      <div className="flex justify-between items-start">
+        <div className="p-3 rounded-2xl bg-[#15171c] border border-gray-800 text-[#1f6b7a] group-hover:bg-[#1f6b7a] group-hover:text-white group-hover:border-[#1f6b7a] transition-all duration-300">
+          <Award size={20} />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="px-2 py-1 rounded-md bg-teal-950/30 border border-teal-900/50 text-[10px] font-bold text-teal-400 uppercase tracking-tighter">
+            Verified
+          </div>
+          <ExternalLink size={14} className="text-gray-600 group-hover:text-white transition-colors" />
+        </div>
       </div>
-      <ExternalLink size={14} className="text-gray-600 group-hover:text-white" />
+
+      <div className="space-y-1">
+        <h4 className="font-bold text-base text-gray-100 group-hover:text-white leading-tight">
+          {title}
+        </h4>
+      </div>
+
+      {image && (
+        <div className="mt-2 relative group-item overflow-hidden rounded-2xl border border-gray-800/50 aspect-[16/10]">
+          <img
+            src={`http://localhost:5000${image}`}
+            alt={title}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        </div>
+      )}
+
+      <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-800/50">
+        <div className="flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#1f6b7a]"></div>
+          <p className="text-[10px] text-gray-500 font-mono uppercase tracking-widest">{date}</p>
+        </div>
+        <div className="w-6 h-6 rounded-full border border-gray-800 flex items-center justify-center text-gray-600 group-hover:text-[#1f6b7a] group-hover:border-[#1f6b7a]/30 transition-all">
+          <X size={12} />
+        </div>
+      </div>
     </div>
-    <h4 className="font-bold text-sm text-gray-200 group-hover:text-white">{title}</h4>
-    <p className="text-xs text-gray-500 mt-1">{issuer}</p>
-    <p className="text-[10px] text-gray-600 mt-2 font-mono uppercase">{date}</p>
-  </div>
+  </motion.div>
 );
 
-const ProjectCard = ({ title, desc, stack }) => (
-  <div className="p-4 rounded-xl bg-[#15171c] border border-gray-800 hover:border-[#1f6b7a]/50 transition-colors">
-    <div className="flex justify-between items-start">
-      <h4 className="font-bold text-white mb-1">{title}</h4>
-      <div className="flex gap-2">
-        <Github size={16} className="text-gray-500 hover:text-white cursor-pointer" />
-        <ExternalLink size={16} className="text-gray-500 hover:text-white cursor-pointer" />
+const ProjectCard = ({ title, desc, stack, github, live }) => (
+  <motion.div
+    whileHover={{ y: -5, transition: { duration: 0.2 } }}
+    className="p-6 rounded-3xl bg-[#1a1d23] border border-gray-800 hover:border-[#1f6b7a]/40 group transition-all relative overflow-hidden flex flex-col h-full shadow-lg hover:shadow-teal-900/20"
+  >
+    {/* Background Decorative Element */}
+    <div className="absolute top-0 right-0 w-32 h-32 bg-[#1f6b7a]/5 blur-3xl rounded-full -mr-16 -mt-16 pointer-events-none group-hover:bg-[#1f6b7a]/10 transition-colors"></div>
+
+    <div className="flex flex-col gap-4 relative z-10">
+      <div className="flex justify-between items-start">
+        <div className="p-3 rounded-2xl bg-[#15171c] border border-gray-800 text-[#1f6b7a] group-hover:bg-[#1f6b7a] group-hover:text-white group-hover:border-[#1f6b7a] transition-all duration-300">
+          <Folder size={20} />
+        </div>
+        <div className="flex items-center gap-3 pr-10">
+          {github && (
+            <a
+              href={github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg bg-gray-800/40 text-gray-500 hover:text-white hover:bg-gray-700 transition-all"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Github size={18} />
+            </a>
+          )}
+          {live && (
+            <a
+              href={live}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 rounded-lg bg-gray-800/40 text-gray-500 hover:text-white hover:bg-gray-700 transition-all"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ExternalLink size={18} />
+            </a>
+          )}
+        </div>
       </div>
+
+      <div className="space-y-2">
+        <h4 className="font-bold text-lg text-gray-100 group-hover:text-white leading-tight">
+          {title}
+        </h4>
+        <p className="text-sm text-gray-400 line-clamp-3 leading-relaxed group-hover:text-gray-300 transition-colors">
+          {desc}
+        </p>
+      </div>
+
+      {stack && stack.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-auto pt-4 border-t border-gray-800/50">
+          {stack.map((tech, i) => (
+            <span
+              key={i}
+              className="px-2.5 py-1 rounded-md bg-gray-800/50 border border-gray-700/50 text-[10px] font-bold text-gray-400 uppercase tracking-tighter group-hover:border-[#1f6b7a]/30 group-hover:text-teal-400 transition-all"
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
-    <p className="text-sm text-gray-400 mb-3 leading-relaxed">{desc}</p>
-    <div className="flex gap-2 flex-wrap">
-      {stack.map(tech => (
-        <span key={tech} className="text-[10px] px-2 py-1 rounded bg-gray-800 text-gray-400 border border-gray-700">
-          {tech}
-        </span>
-      ))}
-    </div>
-  </div>
+  </motion.div>
 );
 
 export default StudentProfileBuilder;

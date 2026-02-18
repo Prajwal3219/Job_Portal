@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 
 const Sidebar = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user, logout } = useAuth();
 
     const isActive = (path) => {
         if (path === '/dashboard/recruiter' && location.pathname === '/dashboard/recruiter') return true;
@@ -71,14 +73,19 @@ const Sidebar = ({ isOpen, onClose }) => {
             {/* User Profile Footer */}
             <div className="p-4 border-t border-white/5 bg-[#15171c]">
                 <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1f6b7a] to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-lg">AM</div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#1f6b7a] to-cyan-500 flex items-center justify-center text-xs font-bold text-white shadow-lg">
+                        {user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : '??'}
+                    </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-white truncate">Alex Morgan</p>
-                        <p className="text-[10px] text-gray-400 truncate">Senior Recruiter</p>
+                        <p className="text-xs font-bold text-white truncate">{user?.name || 'Recruiter'}</p>
+                        <p className="text-[10px] text-gray-400 truncate">{user?.email || 'Senior Recruiter'}</p>
                     </div>
                     <button
                         className="text-gray-500 hover:text-white transition-colors"
-                        onClick={() => navigate('/auth')}
+                        onClick={() => {
+                            logout();
+                            navigate('/auth');
+                        }}
                     >
                         <span className="material-symbols-outlined text-[18px]">logout</span>
                     </button>
@@ -107,6 +114,32 @@ const Sidebar = ({ isOpen, onClose }) => {
 
 export default function RecruiterLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const token = params.get('token');
+
+        if (token) {
+            localStorage.setItem('token', token);
+
+            // Fetch user data
+            fetch('http://localhost:5000/api/recruiter/me', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    login({ ...data, token, role: 'recruiter' });
+                    // Remove token from URL
+                    navigate(location.pathname, { replace: true });
+                })
+                .catch(err => console.error('Failed to fetch user:', err));
+        }
+    }, [location, login, navigate]);
 
     return (
         <div className="fixed inset-0 z-50 flex flex-col lg:flex-row w-screen h-screen bg-[#15171c] text-white font-sans overflow-hidden selection:bg-[#1f6b7a] selection:text-white">

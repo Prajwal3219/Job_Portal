@@ -1,9 +1,12 @@
-import React from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
-import { StatCard, ApplicantRow } from './RecruiterComponents';
+import { useAuth } from '../../../context/AuthContext';
+import { ApplicantRow, StatCard } from './RecruiterComponents';
 
 export default function RecruiterDashboard() {
   const { setIsSidebarOpen } = useOutletContext();
+  const { user } = useAuth();
+  const firstName = user?.name ? user.name.split(' ')[0] : 'Recruiter';
+
 
   return (
     <>
@@ -21,7 +24,7 @@ export default function RecruiterDashboard() {
         </div>
 
         <div className="w-1/3 flex flex-col items-center justify-center text-center">
-          <h1 className="text-sm sm:text-base font-bold text-white tracking-tight whitespace-nowrap">Recruiter Console</h1>
+          <h1 className="text-sm sm:text-base font-bold text-white tracking-tight whitespace-nowrap">Welcome, {firstName}</h1>
           <p className="text-[10px] text-gray-400 hidden sm:block">Manage your hiring pipeline</p>
         </div>
 

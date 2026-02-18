@@ -1,9 +1,11 @@
-﻿import React from 'react';
-import { Search, Bell, ShieldCheck, Menu } from 'lucide-react';
+import { Bell, Menu, Search } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../../../../context/AuthContext';
 
 const AdminHeader = ({ onMenuClick }) => {
+    const { user } = useAuth();
     const location = useLocation();
+    const displayName = user?.name || 'Admin';
 
     const getTitle = () => {
         const path = location.pathname;
@@ -16,7 +18,6 @@ const AdminHeader = ({ onMenuClick }) => {
     };
 
     const title = getTitle();
-
     return (
         <header className="h-16 border-b border-gray-800/50 bg-[#0B0B15] px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30">
 
@@ -61,6 +62,16 @@ const AdminHeader = ({ onMenuClick }) => {
                     <Bell size={20} />
                     <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-recruiter-primary shadow-[0_0_8px_#33ddff]"></span>
                 </button>
+
+                <div className="flex items-center gap-3 pl-4 border-l border-gray-800">
+                    <div className="flex flex-col items-end">
+                        <span className="text-xs font-bold text-white leading-tight">{displayName}</span>
+                        <span className="text-[10px] text-gray-500 font-medium">Administrator</span>
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-recruiter-primary to-blue-500 flex items-center justify-center text-[10px] font-bold text-white shadow-lg ring-2 ring-recruiter-primary/20">
+                        {displayName.charAt(0).toUpperCase()}
+                    </div>
+                </div>
             </div>
         </header>
     );

@@ -1,16 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import { BarChart2, Check, Eye, EyeOff, ShieldAlert } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Check, BarChart2, ShieldAlert } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import AnimatedButton from '../common/AnimatedButton';
 
 const AuthPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     // State
     const [isLogin, setIsLogin] = useState(true);
     const [userType, setUserType] = useState('talent'); // 'talent' or 'recruiter'
     const [showPassword, setShowPassword] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: ''
+    });
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const { name, email, password } = formData;
+
+    const onChange = (e) => {
+        setFormData((prevState) => ({
+            ...prevState,
+            [e.target.id]: e.target.value,
+        }));
+    };
 
     useEffect(() => {
         if (location.state?.view === 'signup') {
@@ -20,15 +38,57 @@ const AuthPage = () => {
         }
     }, [location.state]);
 
-    const handleAuth = (e) => {
+    const handleAuth = async (e) => {
         e.preventDefault();
-        // Preserving existing redirect logic
-        if (userType === 'talent') {
-            console.log("Logging in as Candidate...");
-            navigate('/dashboard/candidate');
-        } else {
-            console.log("Logging in as Recruiter...");
-            navigate('/dashboard/recruiter');
+        setIsLoading(true);
+        setError('');
+
+        const userData = {
+            name: isLogin ? undefined : name,
+            email,
+            password,
+            role: userType
+        };
+
+        try {
+            const apiPrefix = userType === 'recruiter' ? '/api/recruiter' : '/api/candidate';
+            const url = isLogin ? `http://localhost:5000${apiPrefix}/login` : `http://localhost:5000${apiPrefix}/register`;
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            });
+
+            // Check if response is JSON
+            const contentType = response.headers.get("content-type");
+            let data;
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                throw new Error(`Server returned non-JSON response: ${response.status} ${response.statusText}`);
+            }
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Something went wrong');
+            }
+
+            // Save user data to context
+            login(data);
+
+            // For now, just navigate. In a real app, we'd save the token in state/localStorage
+            if (userType === 'talent') {
+                navigate('/dashboard/candidate');
+            } else {
+                navigate('/dashboard/recruiter');
+            }
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -98,8 +158,12 @@ const AuthPage = () => {
                                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Full Name</label>
                                     <input
                                         type="text"
+                                        id="name"
+                                        value={name}
+                                        onChange={onChange}
                                         placeholder="John Doe"
                                         className="w-full bg-[#151A25] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#33ddff] focus:ring-1 focus:ring-[#33ddff] transition-all"
+                                        required={!isLogin}
                                     />
                                 </div>
                             )}
@@ -108,8 +172,12 @@ const AuthPage = () => {
                                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Work Email</label>
                                 <input
                                     type="email"
+                                    id="email"
+                                    value={email}
+                                    onChange={onChange}
                                     placeholder="name@company.com"
                                     className="w-full bg-[#151A25] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#33ddff] focus:ring-1 focus:ring-[#33ddff] transition-all"
+                                    required
                                 />
                             </div>
 
@@ -118,8 +186,12 @@ const AuthPage = () => {
                                 <div className="relative">
                                     <input
                                         type={showPassword ? "text" : "password"}
+                                        id="password"
+                                        value={password}
+                                        onChange={onChange}
                                         placeholder="••••••••"
                                         className="w-full bg-[#151A25] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#33ddff] focus:ring-1 focus:ring-[#33ddff] transition-all"
+                                        required
                                     />
                                     <button
                                         type="button"
@@ -141,12 +213,17 @@ const AuthPage = () => {
                                 </div>
                             )}
 
+                            {error && (
+                                <p className="text-red-500 text-xs text-center">{error}</p>
+                            )}
+
                             <AnimatedButton
                                 type="submit"
-                                className="w-full bg-[#1f6b7a] hover:bg-[#185662] text-white font-bold py-3 rounded-lg shadow-[0_4px_20px_rgba(31,107,122,0.3)] text-sm"
+                                disabled={isLoading}
+                                className="w-full bg-[#1f6b7a] hover:bg-[#185662] text-white font-bold py-3 rounded-lg shadow-[0_4px_20px_rgba(31,107,122,0.3)] text-sm disabled:opacity-50"
                             >
-                                {isLogin ? 'Log In' : 'Get Started'}
-                                {!isLogin && <span className="ml-1">→</span>}
+                                {isLoading ? 'Processing...' : (isLogin ? 'Log In' : 'Get Started')}
+                                {!isLogin && !isLoading && <span className="ml-1">→</span>}
                             </AnimatedButton>
                         </form>
 
@@ -156,11 +233,23 @@ const AuthPage = () => {
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
-                            <button className="flex items-center justify-center gap-2 bg-[#151A25] hover:bg-[#1c212c] border border-white/5 rounded-lg py-2.5 text-xs font-bold transition-all">
+                            <button
+                                onClick={() => {
+                                    const apiPrefix = userType === 'recruiter' ? '/api/recruiter' : '/api/candidate';
+                                    window.location.href = `http://localhost:5000${apiPrefix}/google`;
+                                }}
+                                className="flex items-center justify-center gap-2 bg-[#151A25] hover:bg-[#1c212c] border border-white/5 rounded-lg py-2.5 text-xs font-bold transition-all"
+                            >
                                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-4 h-4" alt="Google" />
                                 Google
                             </button>
-                            <button className="flex items-center justify-center gap-2 bg-[#151A25] hover:bg-[#1c212c] border border-white/5 rounded-lg py-2.5 text-xs font-bold transition-all">
+                            <button
+                                onClick={() => {
+                                    const apiPrefix = userType === 'recruiter' ? '/api/recruiter' : '/api/candidate';
+                                    window.location.href = `http://localhost:5000${apiPrefix}/github`;
+                                }}
+                                className="flex items-center justify-center gap-2 bg-[#151A25] hover:bg-[#1c212c] border border-white/5 rounded-lg py-2.5 text-xs font-bold transition-all"
+                            >
                                 <img src="https://cdn.worldvectorlogo.com/logos/github-icon-2.svg" className="w-4 h-4 invert opacity-70" alt="GitHub" />
                                 GitHub
                             </button>

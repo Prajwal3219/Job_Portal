@@ -877,7 +877,7 @@ const StudentProfileBuilder = () => {
         </div>
 
         {/* RIGHT COLUMN (Neural Links & Timeline) */}
-        <div className="col-span-1 lg:col-span-4 space-y-6">
+        <div className="col-span-1 lg:col-span-4 space-y-6 lg:sticky lg:top-8 h-fit">
 
           {/* Neural Links */}
           <div className={`p-6 rounded-3xl ${theme.cardBg} border ${theme.border}`}>
